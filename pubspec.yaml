@@ -1,0 +1,34 @@
+name: deu_pet
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_card_swiper: ^7.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/icons/search-pet.png
+    - assets/icons/star-menu.png
+    - assets/logo.png
+    - assets/images/pet1.png
+    - assets/images/pet2.png
+    - assets/images/pet3.png
+
+
