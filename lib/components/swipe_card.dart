@@ -41,7 +41,7 @@ class _SwipeCardState extends State<SwipeCard> {
     return SafeArea(
       child: Column(
         children: [
-          Flexible(
+          Expanded(
             child: CardSwiper(
               controller: controller,
               cardsCount: _pets.length,
@@ -54,23 +54,21 @@ class _SwipeCardState extends State<SwipeCard> {
               numberOfCardsDisplayed: 1, // Exibe apenas 1 card por vez
               backCardOffset:
                   Offset.zero, // Remove o deslocamento da próxima carta
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(0.0), // Removendo padding
               cardBuilder: (context, index, _, __) {
                 final pet = _pets[index];
                 return Card(
+                  margin: EdgeInsets.zero, // Remove a margem do card
                   child: Stack(
+                    fit: StackFit.expand, // Faz o Stack ocupar todo o espaço
                     children: [
                       // Imagem do pet
                       Image.asset(
                         pet['image']!,
-                        fit: BoxFit.cover,
-                        height: MediaQuery.of(context).size.height *
-                            0.9, // Ajusta o tamanho da imagem
-                        width: double.infinity,
+                        fit: BoxFit.cover, // Mantém a proporção da imagem
                       ),
                       // Sobreposição escura para dar destaque ao texto
                       Container(
-                        height: MediaQuery.of(context).size.height * 0.9,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
