@@ -28,9 +28,39 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
+  // Função que é chamada ao tocar em um item do BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+    });
+  }
+
+  // Função que retorna o conteúdo baseado no índice selecionado
+  Widget _buildContent() {
+    switch (_selectedIndex) {
+      case 0:
+        return SwipeCard(
+            showFavorites: _goToFavorites); // Passa a função para SwipeCard
+      case 1:
+        return Center(
+            child: Text('Buscar Página')); // Placeholder para "Buscar"
+      case 2:
+        return Center(
+            child: Text('Favoritos Página')); // Placeholder para "Favoritos"
+      case 3:
+        return Center(child: Text('Chat Página')); // Placeholder para "Chat"
+      case 4:
+        return Center(
+            child: Text('Perfil Página')); // Placeholder para "Perfil"
+      default:
+        return Center(child: Text('Página desconhecida'));
+    }
+  }
+
+  // Função para alterar o índice para a aba Favoritos
+  void _goToFavorites() {
+    setState(() {
+      _selectedIndex = 2; // Define o índice da aba Favoritos
     });
   }
 
@@ -38,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      body: SwipeCard(),
+      body: _buildContent(), // Exibe o conteúdo com base no índice selecionado
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,

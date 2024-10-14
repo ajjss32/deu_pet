@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 
 class SwipeCard extends StatefulWidget {
+  final VoidCallback showFavorites; // Função passada pela HomeScreen
+
+  SwipeCard({required this.showFavorites});
+
   @override
   _SwipeCardState createState() => _SwipeCardState();
 }
@@ -51,23 +55,20 @@ class _SwipeCardState extends State<SwipeCard> {
                 }
                 return true;
               },
-              numberOfCardsDisplayed: 1, // Exibe apenas 1 card por vez
-              backCardOffset:
-                  Offset.zero, // Remove o deslocamento da próxima carta
-              padding: const EdgeInsets.all(0.0), // Removendo padding
+              numberOfCardsDisplayed: 1,
+              backCardOffset: Offset.zero,
+              padding: const EdgeInsets.all(0.0),
               cardBuilder: (context, index, _, __) {
                 final pet = _pets[index];
                 return Card(
-                  margin: EdgeInsets.zero, // Remove a margem do card
+                  margin: EdgeInsets.zero,
                   child: Stack(
-                    fit: StackFit.expand, // Faz o Stack ocupar todo o espaço
+                    fit: StackFit.expand,
                     children: [
-                      // Imagem do pet
                       Image.asset(
                         pet['image']!,
-                        fit: BoxFit.cover, // Mantém a proporção da imagem
+                        fit: BoxFit.cover,
                       ),
-                      // Sobreposição escura para dar destaque ao texto
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -80,7 +81,6 @@ class _SwipeCardState extends State<SwipeCard> {
                           ),
                         ),
                       ),
-                      // Texto sobre a imagem (nome, idade e descrição)
                       Positioned(
                         bottom: 100,
                         left: 20,
@@ -96,13 +96,6 @@ class _SwipeCardState extends State<SwipeCard> {
                                     fontSize: 42,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 10.0,
-                                        color: Colors.black,
-                                        offset: Offset(2, 2),
-                                      ),
-                                    ],
                                   ),
                                 ),
                                 SizedBox(width: 10),
@@ -111,13 +104,6 @@ class _SwipeCardState extends State<SwipeCard> {
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 10.0,
-                                        color: Colors.black,
-                                        offset: Offset(2, 2),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ],
@@ -128,25 +114,17 @@ class _SwipeCardState extends State<SwipeCard> {
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
-                                shadows: [
-                                  Shadow(
-                                    blurRadius: 10.0,
-                                    color: Colors.black,
-                                    offset: Offset(2, 2),
-                                  ),
-                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      // Ícones abaixo do nome e idade
                       Positioned(
-                        bottom: 10, // Abaixo do nome e da descrição
+                        bottom: 10,
                         left: 80,
                         child: _buildIconButton(
                           icon: Icons.cancel,
-                          color: Color(0xFFF7566B), // Cor da borda de cancelar
+                          color: Color(0xFFF7566B),
                           onPressed: () =>
                               controller.swipe(CardSwiperDirection.left),
                         ),
@@ -156,7 +134,7 @@ class _SwipeCardState extends State<SwipeCard> {
                         right: 80,
                         child: _buildIconButton(
                           icon: Icons.favorite,
-                          color: Color(0xFF20ECB9), // Cor da borda de favorito
+                          color: Color(0xFF20ECB9),
                           onPressed: () {
                             controller.swipe(CardSwiperDirection.right);
                             _showFavoriteDialog(context);
@@ -182,21 +160,14 @@ class _SwipeCardState extends State<SwipeCard> {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 70, // Tamanho do círculo
+        width: 70,
         height: 70,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: color, // Define a cor da borda com base no ícone
-            width: 1, // Reduz o tamanho da borda
-          ),
+          border: Border.all(color: color, width: 1),
         ),
         child: Center(
-          child: Icon(
-            icon,
-            color: color, // Define a cor do ícone
-            size: 38, // Tamanho do ícone
-          ),
+          child: Icon(icon, color: color, size: 38),
         ),
       ),
     );
@@ -210,54 +181,51 @@ class _SwipeCardState extends State<SwipeCard> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
-          backgroundColor: Colors.white.withOpacity(
-              0.9), // Tornar o fundo do pop-up um pouco transparente
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          backgroundColor: Colors.white.withOpacity(0.9),
+          content: Stack(
             children: [
-              Expanded(
-                child: Text(
-                  'Pet adicionado à lista de favoritos!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 30),
+                  Text(
+                    'Pet adicionado à lista de favoritos!',
+                    style: TextStyle(fontSize: 18, color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.cancel, color: Color(0xFFF7566B)),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-          content: Container(
-            height: 60,
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Para evitar overflow
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF20ECB9), // Cor do botão
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF20ECB9),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      // Primeiro, fecha o pop-up
+                      Navigator.of(context).pop();
+
+                      // Em seguida, altera para a aba de favoritos
+                      widget.showFavorites();
+                    },
+                    child: Text(
+                      'Ir para lista de favoritos!',
+                      style: TextStyle(fontSize: 17, color: Colors.white),
                     ),
                   ),
+                ],
+              ),
+              Positioned(
+                top: -10,
+                right: -10,
+                child: IconButton(
+                  icon: Icon(Icons.cancel, color: Color(0xFFF7566B)),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    // Redirecionar para a lista de favoritos
                   },
-                  child: Text(
-                    'Ir para lista de favoritos!',
-                    style: TextStyle(
-                      fontSize: 17,
-                      color: Colors.white,
-                    ),
-                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
