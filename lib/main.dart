@@ -1,3 +1,4 @@
+import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:flutter/material.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
@@ -45,8 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return Center(
             child: Text('Buscar Página')); // Placeholder para "Buscar"
       case 2:
-        return Center(
-            child: Text('Favoritos Página')); // Placeholder para "Favoritos"
+        return Center(child: FavoritePage()); // Placeholder para "Favoritos"
       case 3:
         return Center(child: Text('Chat Página')); // Placeholder para "Chat"
       case 4:
