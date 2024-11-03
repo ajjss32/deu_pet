@@ -23,6 +23,10 @@ class CustomBottomNavBar extends StatelessWidget {
           label: 'Chat',
         ),
         BottomNavigationBarItem(
+          icon: Icon(Icons.add_circle), // Ícone de mais
+          label: 'Cadastro Animal',
+        ),
+        BottomNavigationBarItem(
           icon: Icon(Icons.person), // Ícone de perfil
           label: 'Perfil',
         ),
