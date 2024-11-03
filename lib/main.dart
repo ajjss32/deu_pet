@@ -1,4 +1,5 @@
 import 'package:deu_pet/pages/favorite_page.dart';
+import 'package:deu_pet/pages/pet_registration.dart';
 import 'package:flutter/material.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
@@ -47,6 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return Center(child: Text('Chat Página')); // Placeholder para "Chat"
       case 3:
+        return Center(child: PetRegistration()); // Placeholder para "Chat"
+      case 4:
         return Center(
             child: Text('Perfil Página')); // Placeholder para "Perfil"
       default:
