@@ -13,7 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: <Widget>[
         IconButton(
-          icon: Icon(Icons.search), // Ícone de pesquisa
+          icon: Icon(Icons.notifications), // Ícone de pesquisa
           onPressed: () {
             print('Pesquisa acionada');
           },

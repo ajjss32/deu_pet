@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
 import 'components/swipe_card.dart';
-import 'screens/favorite_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -29,17 +28,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  List<Map<String, String>> favoritePets = [];
 
+  // Função que é chamada ao tocar em um item do BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-<<<<<<< HEAD
-  void _showFavorites() {
-=======
   // Função que retorna o conteúdo baseado no índice selecionado
   Widget _buildContent() {
     switch (_selectedIndex) {
@@ -47,13 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
         return SwipeCard(
             showFavorites: _goToFavorites); // Passa a função para SwipeCard
       case 1:
-        return Center(
-            child: Text('Buscar Página')); // Placeholder para "Buscar"
-      case 2:
         return Center(child: FavoritePage()); // Placeholder para "Favoritos"
-      case 3:
+      case 2:
         return Center(child: Text('Chat Página')); // Placeholder para "Chat"
-      case 4:
+      case 3:
         return Center(
             child: Text('Perfil Página')); // Placeholder para "Perfil"
       default:
@@ -63,32 +56,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Função para alterar o índice para a aba Favoritos
   void _goToFavorites() {
->>>>>>> origin/main
     setState(() {
-      _selectedIndex = 2; // Índice da aba de Favoritos
+      _selectedIndex = 2; // Define o índice da aba Favoritos
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget currentPage;
-    switch (_selectedIndex) {
-      case 0:
-        currentPage = SwipeCard(
-          showFavorites: _showFavorites,
-          favoritePets: favoritePets,
-        );
-        break;
-      case 2:
-        currentPage = FavoriteScreen(favoritePets: favoritePets);
-        break;
-      default:
-        currentPage = Center(child: Text('Outra página'));
-    }
-
     return Scaffold(
       appBar: CustomAppBar(),
-      body: currentPage,
+      body: _buildContent(), // Exibe o conteúdo com base no índice selecionado
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,

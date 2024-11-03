@@ -11,12 +11,8 @@ class CustomBottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.water_drop), // Ícone de gota
+          icon: Icon(Icons.home), // Ícone de gota
           label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.widgets),
-          label: 'Buscar',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.star), // Ícone personalizado de estrela

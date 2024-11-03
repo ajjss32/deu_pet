@@ -27,7 +27,7 @@ class PetIndividualPage extends StatelessWidget {
       children: [
         SizedBox(height: 24),
         Expanded(
-          flex: 12,
+          flex: 20,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: ListView.builder(
@@ -46,11 +46,11 @@ class PetIndividualPage extends StatelessWidget {
                   height: 250,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(
-                      Radius.circular(24),
+                      Radius.circular(10),
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(10),
                     child: Image.asset(
                       data['image'][index],
                       fit: BoxFit.cover,
