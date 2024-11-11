@@ -35,10 +35,7 @@ flutter:
     - assets/images/pet-bob-3.jpg
     - assets/images/pet-rex-2.jpg
     - assets/images/pet-rex-3.jpg
-<<<<<<< HEAD
-=======
     - assets/images/pet-bella.jpg
     - assets/images/pet-bella-2.jpeg
     - assets/images/pet-bella-3.jpg
->>>>>>> a8c9c66 (Commit da Tela de visualização dos animais cadastrados e tela individual do pet no perfil do voluntário)
 
