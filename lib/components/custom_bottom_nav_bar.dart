@@ -11,28 +11,32 @@ class CustomBottomNavBar extends StatelessWidget {
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home), // Ícone de gota
+          icon: Icon(Icons.home),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.star), // Ícone personalizado de estrela
+          icon: Icon(Icons.star),
           label: 'Favoritos',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.chat), // Ícone de chat
+          icon: Icon(Icons.chat),
           label: 'Chat',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.add_circle), // Ícone de mais
+          icon: Icon(Icons.add_circle),
           label: 'Cadastro Animal',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person), // Ícone de perfil
+          icon: Icon(Icons.pets), // Novo ícone de "Animais Cadastrados"
+          label: 'Animais',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person),
           label: 'Perfil',
         ),
       ],
       currentIndex: selectedIndex,
-      selectedItemColor: Color(0xFF4E59D9), // Cor do item selecionado (#7C8692)
+      selectedItemColor: Color(0xFF4E59D9), // Cor do item selecionado
       unselectedItemColor: Color(0xFF7C8692), // Cor dos itens não selecionados
       onTap: onItemTapped,
     );

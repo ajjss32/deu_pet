@@ -1,5 +1,6 @@
 import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:deu_pet/pages/pet_registration.dart';
+import 'package:deu_pet/pages/pet_lista.dart';
 import 'package:flutter/material.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
@@ -41,17 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildContent() {
     switch (_selectedIndex) {
       case 0:
-        return SwipeCard(
-            showFavorites: _goToFavorites); // Passa a função para SwipeCard
+        return SwipeCard(showFavorites: _goToFavorites);
       case 1:
-        return Center(child: FavoritePage()); // Placeholder para "Favoritos"
+        return FavoritePage();
       case 2:
-        return Center(child: Text('Chat Página')); // Placeholder para "Chat"
+        return Center(child: Text('Chat Página'));
       case 3:
-        return Center(child: PetRegistration()); // Placeholder para "Chat"
+        return PetRegistration();
       case 4:
-        return Center(
-            child: Text('Perfil Página')); // Placeholder para "Perfil"
+        return PetListScreen(); // Adiciona a tela de listagem de pets
+      case 5:
+        return Center(child: Text('Perfil Página'));
       default:
         return Center(child: Text('Página desconhecida'));
     }

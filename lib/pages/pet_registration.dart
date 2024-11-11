@@ -16,6 +16,8 @@ class _PetRegistrationState extends State<PetRegistration> {
   final TextEditingController _specialNeedsController = TextEditingController();
   final TextEditingController _historyController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _speciesController =
+      TextEditingController(); // Adicionado
 
   String? _selectedSex;
   String? _selectedSize;
@@ -38,6 +40,7 @@ class _PetRegistrationState extends State<PetRegistration> {
     _locationController.clear();
     _specialNeedsController.clear();
     _historyController.clear();
+    _speciesController.clear();
     setState(() {
       _image = null;
       _selectedSex = null;
@@ -163,6 +166,16 @@ class _PetRegistrationState extends State<PetRegistration> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Nome',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateRequiredField,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                // Campo de Espécie/Raça
+                controller: _speciesController,
+                decoration: InputDecoration(
+                  labelText: 'Espécie/Raça',
                   border: OutlineInputBorder(),
                 ),
                 validator: _validateRequiredField,
@@ -301,16 +314,14 @@ class _PetRegistrationState extends State<PetRegistration> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF50BB88),
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(5),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: Text(
                     'Cadastrar Pet',
                     style: TextStyle(
                       fontSize: 18,
-                      color: Color(
-                          0xFFFFFFFF),
+                      color: Color(0xFFFFFFFF),
                     ),
                   ),
                 ),

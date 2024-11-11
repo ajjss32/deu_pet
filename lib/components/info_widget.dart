@@ -1,13 +1,15 @@
-
 import 'package:flutter/material.dart';
 
 class InfoWidget extends StatelessWidget {
   final String title;
   final String value;
+  final double fontSize; // Adiciona o parâmetro fontSize
+
   const InfoWidget({
     super.key,
     required this.title,
     required this.value,
+    this.fontSize = 14, // Define o valor padrão para fontSize
   });
 
   @override
@@ -22,7 +24,7 @@ class InfoWidget extends StatelessWidget {
             title,
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: 16,
+              fontSize: fontSize, // Usa o fontSize passado
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -30,7 +32,8 @@ class InfoWidget extends StatelessWidget {
             value,
             style: TextStyle(
               color: Colors.grey,
-              fontSize: 14,
+              fontSize: fontSize -
+                  2, // Ajusta o tamanho do valor para ser um pouco menor que o título
               fontWeight: FontWeight.bold,
             ),
           ),
