@@ -161,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
-          return Center(child: Text('Perfil Página'));
+          return _buildProfilePage();
         default:
           return Center(child: Text('Página desconhecida'));
       }
@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
-          return Center(child: Text('Perfil Página'));
+          return _buildProfilePage();
         default:
           return Center(child: Text('Página desconhecida'));
       }
@@ -188,6 +188,32 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = 1; // Define o índice da aba Favoritos
     });
+  }
+
+  Widget _buildProfilePage() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => UserTypePage()),
+              );
+            },
+            child: Text('Sair'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              textStyle: TextStyle(fontSize: 18),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override

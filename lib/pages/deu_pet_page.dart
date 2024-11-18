@@ -9,6 +9,7 @@ class _ChatScreenState extends State<ChatScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  final TextEditingController _messageController = TextEditingController();
 
   @override
   void initState() {
@@ -30,7 +31,59 @@ class _ChatScreenState extends State<ChatScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _messageController.dispose();
     super.dispose();
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          contentPadding: EdgeInsets.all(20),
+          content: Stack(
+            children: [
+              Container(
+                width: 221,
+                height: 86,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Mensagem enviada com sucesso!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF787879),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 0.0,
+                top: 0.0,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -144,6 +197,7 @@ class _ChatScreenState extends State<ChatScreen>
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _messageController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
@@ -159,7 +213,17 @@ class _ChatScreenState extends State<ChatScreen>
                   SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
-                      // Ação do botão Enviar
+                      if (_messageController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'O campo de mensagem não pode estar vazio!'),
+                          ),
+                        );
+                      } else {
+                        _messageController.clear();
+                        _showSuccessDialog();
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       padding:
