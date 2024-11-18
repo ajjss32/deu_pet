@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'deu_pet_page.dart'; // Importa a tela de chat
 
 class SeeInterestedPage extends StatelessWidget {
   // Lista de interessados com suas informações
@@ -70,9 +71,20 @@ class SeeInterestedPage extends StatelessWidget {
                     Text(interestedPeople[index]['contact']!),
                   ],
                 ),
-                trailing: Icon(
-                  Icons.favorite_border,
-                  color: const Color.fromARGB(255, 85, 16, 224),
+                trailing: GestureDetector(
+                  onTap: () {
+                    // Redireciona para a tela de chat ao clicar no coração
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(), // Tela de chat
+                      ),
+                    );
+                  },
+                  child: Icon(
+                    Icons.favorite_border,
+                    color: const Color.fromARGB(255, 85, 16, 224),
+                  ),
                 ),
               ),
             ),
