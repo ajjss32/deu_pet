@@ -7,62 +7,103 @@ import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
 
-// Página para escolha do tipo de usuário (Adotante ou Voluntário)
 class UserTypePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Escolha seu Tipo de Usuário")),
-      body: Center(
+      body: Container(
+        color: Colors.white, // Fundo branco para todo o body
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo centralizado
-            Image.asset(
-              'assets/logo.png', // Substitua pelo caminho correto da sua imagem
-              width: 150,
-              height: 150,
+            // Primeira parte: imagem de fundo (foto)
+            SizedBox(
+              height: 90, // Espaçamento para descer a imagem
             ),
-            SizedBox(height: 40), // Espaço entre o logo e os botões
-
-            // Botão "Adotante"
-            ElevatedButton(
-              onPressed: () {
-                // Ação do botão "Adotante"
-                print("Adotante escolhido");
-                // Navegar para a HomeScreen e definir o tipo de usuário
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(userType: 'adotante'),
-                  ),
-                );
-              },
-              child: Text("Adotante"),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
+            Container(
+              width: double.infinity,
+              height: 400,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/images/Background.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            SizedBox(height: 20), // Espaço entre os botões
 
-            // Botão "Voluntário"
-            ElevatedButton(
-              onPressed: () {
-                // Ação do botão "Voluntário"
-                print("Voluntário escolhido");
-                // Navegar para a HomeScreen e definir o tipo de usuário
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(userType: 'voluntario'),
+            // Segunda parte: texto com botões
+            Container(
+              padding: EdgeInsets.all(40),
+              width: double.infinity,
+              color: Colors.white,
+              child: Column(
+                children: [
+                  Text(
+                    "Selecione seu Tipo de Usuário",
+                    style: TextStyle(fontSize: 25),
+                    textAlign: TextAlign.center,
                   ),
-                );
-              },
-              child: Text("Voluntário"),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
+                  SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(userType: 'adotante'),
+                            ),
+                          );
+                        },
+                        child: Text("Adotante"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(
+                              255, 85, 16, 224), // Cor de fundo roxa
+                          foregroundColor: Colors.white, // Cor do texto branca
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          textStyle: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(userType: 'voluntario'),
+                            ),
+                          );
+                        },
+                        child: Text("Voluntário"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(
+                              255, 85, 16, 224), // Cor de fundo roxa
+                          foregroundColor: Colors.white, // Cor do texto branca
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          textStyle: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 60),
+                ],
+              ),
+            ),
+
+            // Espaço entre o conteúdo e o logo
+            Spacer(),
+
+            // Logo no final da página
+            Padding(
+              padding: EdgeInsets.only(bottom: 20), // Adiciona margem inferior
+              child: Image.asset(
+                'assets/logo.png',
+                width: 50,
+                height: 50,
               ),
             ),
           ],

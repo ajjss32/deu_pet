@@ -5,19 +5,20 @@ class SeeInterestedPage extends StatelessWidget {
   // Lista de interessados com suas informações
   final List<Map<String, String>> interestedPeople = [
     {
-      'name': 'João Silva',
-      'age': '28 anos',
-      'city': 'São Paulo',
-      'contact': 'joao.silva@email.com',
-      'image': 'assets/images/person1.jpg', // Caminho da imagem
-    },
-    {
       'name': 'Maria Oliveira',
       'age': '34 anos',
       'city': 'Rio de Janeiro',
       'contact': 'maria.oliveira@email.com',
       'image': 'assets/images/person2.jpg', // Caminho da imagem
     },
+    {
+      'name': 'João Silva',
+      'age': '28 anos',
+      'city': 'São Paulo',
+      'contact': 'joao.silva@email.com',
+      'image': 'assets/images/person1.jpg', // Caminho da imagem
+    },
+
     {
       'name': 'Carlos Souza',
       'age': '22 anos',

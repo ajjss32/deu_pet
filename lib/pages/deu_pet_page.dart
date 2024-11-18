@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen>
                                 width: 5.0,
                               ),
                               image: DecorationImage(
-                                image: AssetImage('assets/images/person1.jpg'),
+                                image: AssetImage('assets/images/person2.jpg'),
                                 fit: BoxFit.cover,
                               ),
                             ),
