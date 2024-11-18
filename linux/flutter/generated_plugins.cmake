@@ -3,10 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-<<<<<<< HEAD
-=======
   file_selector_linux
->>>>>>> a8c9c66 (Commit da Tela de visualização dos animais cadastrados e tela individual do pet no perfil do voluntário)
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

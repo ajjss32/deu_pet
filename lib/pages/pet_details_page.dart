@@ -1,28 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:deu_pet/components/info_widget.dart';
 import 'package:deu_pet/components/custom_app_bar.dart';
+import 'see_interested_page.dart'; // Importe a página de interessados
 
 class PetDetailsPage extends StatelessWidget {
   final Map<String, dynamic> data;
 
-  PetDetailsPage({required this.data});
+  const PetDetailsPage({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      body: _buildBody(),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          // Ação do botão flutuante (ex.: deletar ou compartilhar)
-        },
-        child: Icon(Icons.delete, color: Colors.red),
+      body: _buildBody(context), // Passando o contexto para o método
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            FloatingActionButton.extended(
+              backgroundColor: Colors.white,
+              onPressed: () {
+                // Navega até a página de interessados sem passar dados
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        SeeInterestedPage(), // Sem precisar passar a lista de interessados
+                  ),
+                );
+              },
+              label: Text("Ver Interessados",
+                  style: TextStyle(color: Colors.blue)),
+              icon: Icon(Icons.visibility, color: Colors.blue),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Column(
       children: [
         SizedBox(height: 16), // Menor espaçamento superior
@@ -62,11 +81,10 @@ class PetDetailsPage extends StatelessWidget {
             children: [
               Text(
                 data['name'],
-                style: TextStyle(fontSize: 28), // Fonte menor
+                style: TextStyle(fontSize: 28),
               ),
               SizedBox(width: 4),
-              Icon(Icons.pets,
-                  color: Color(0xFF7C8692), size: 24), // Ícone menor
+              Icon(Icons.pets, color: Color(0xFF7C8692), size: 24),
             ],
           ),
         ),
@@ -75,12 +93,12 @@ class PetDetailsPage extends StatelessWidget {
           flex: 30,
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 60.0),
             child: GridView.count(
               crossAxisCount: 2,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 2.5, // Ajustado para menos altura
+              childAspectRatio: 2.5,
               children: [
                 InfoWidget(title: 'Nome', value: data['name'], fontSize: 14),
                 InfoWidget(
