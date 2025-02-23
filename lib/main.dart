@@ -6,6 +6,8 @@ import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 class UserTypePage extends StatelessWidget {
   @override
@@ -113,7 +115,11 @@ class UserTypePage extends StatelessWidget {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
