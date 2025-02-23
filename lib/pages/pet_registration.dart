@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
+import 'package:uuid/uuid.dart';
+import 'package:deu_pet/services/pet_service.dart';
+import 'package:deu_pet/model/pet.dart';
 
 class PetRegistration extends StatefulWidget {
   @override
@@ -16,12 +20,13 @@ class _PetRegistrationState extends State<PetRegistration> {
   final TextEditingController _specialNeedsController = TextEditingController();
   final TextEditingController _historyController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _speciesController =
-      TextEditingController(); // Adicionado
+  final TextEditingController _speciesController = TextEditingController();
 
   String? _selectedSex;
   String? _selectedSize;
   String? _selectedTemperament;
+
+  final PetService _petService = PetService();
 
   Future<void> _pickImage() async {
     final pickedFile =
@@ -117,14 +122,46 @@ class _PetRegistrationState extends State<PetRegistration> {
     return null;
   }
 
-  void _registerPet() {
+  void _registerPet() async {
     if (_formKey.currentState!.validate()) {
-      _showSuccessDialog();
-      _clearFields();
+      try {
+        String petId = Uuid().v4();
+
+        // Converter a imagem para base64
+        String? fotoBase64;
+        if (_image != null) {
+          fotoBase64 = base64Encode(_image!.readAsBytesSync());
+        }
+
+        Pet novoPet = Pet(
+          id: petId,
+          nome: _nameController.text,
+          foto: fotoBase64 ?? "",
+          idade: int.parse(_ageController.text),
+          porte: _selectedSize ?? "",
+          sexo: _selectedSex ?? "",
+          temperamento: _selectedTemperament ?? "",
+          estadoDeSaude: _healthController.text,
+          endereco: _locationController.text,
+          necessidades: _specialNeedsController.text,
+          historia: _historyController.text,
+          status: "Disponível",
+          voluntarioId: "voluntarioIdAqui", // Substitua pelo ID do voluntário logado
+          dataCriacao: DateTime.now(),
+          dataAtualizacao: DateTime.now(),
+        );
+
+        await _petService.criarPet(novoPet, context);
+        _showSuccessDialog();
+        _clearFields();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao cadastrar pet: $e')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Por favor, preencha todos os campos corretamente.')),
+        SnackBar(content: Text('Por favor, preencha todos os campos corretamente.')),
       );
     }
   }
@@ -172,7 +209,6 @@ class _PetRegistrationState extends State<PetRegistration> {
               ),
               SizedBox(height: 20),
               TextFormField(
-                // Campo de Espécie/Raça
                 controller: _speciesController,
                 decoration: InputDecoration(
                   labelText: 'Espécie/Raça',
