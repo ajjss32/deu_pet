@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/ana/Documents/deu_pet/linux"
+    "cmake.sourceDirectory": "/home/ana/Documents/deu_pet/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

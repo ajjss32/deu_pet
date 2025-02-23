@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'deupet-23e59.firebasestorage.app',
     measurementId: 'G-V9K8S4D4S7',
   );
+
 }

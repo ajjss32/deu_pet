@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
+import 'package:deu_pet/pages/user_registration.dart';
 import 'package:deu_pet/pages/pet_registration.dart';
 import 'package:deu_pet/pages/pet_lista.dart';
 import 'components/custom_app_bar.dart';
@@ -118,7 +119,7 @@ class UserTypePage extends StatelessWidget {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
+    options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(MyApp());
 }
@@ -163,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
         case 0:
           return SwipeCard(showFavorites: _goToFavorites);
         case 1:
-          return FavoritePage();
+          return RegistrationPage();
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
