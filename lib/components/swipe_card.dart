@@ -26,6 +26,42 @@ class _SwipeCardState extends State<SwipeCard> {
       'description': 'Thor adora aventuras ao ar livre e corridas.',
       'image': 'assets/images/pet3.jpg'
     },
+    {
+      'name': 'Luna',
+      'age': '1 ano',
+      'description': 'Luna é uma cadelinha carinhosa e adora brincar.',
+      'image': 'assets/images/pet4.jpg'
+    },
+    {
+      'name': 'Max',
+      'age': '4 anos',
+      'description': 'Max é um cachorro protetor e muito leal.',
+      'image': 'assets/images/pet5.jpg'
+    },
+    {
+      'name': 'Mia',
+      'age': '3 anos',
+      'description': 'Mia é uma cadelinha elegante que adora relaxar.',
+      'image': 'assets/images/pet6.jpg'
+    },
+    {
+      'name': 'Zeca',
+      'age': '5 anos',
+      'description': 'Zeca é um gato esperto que ama desafios.',
+      'image': 'assets/images/pet9.png'
+    },
+    {
+      'name': 'Bella',
+      'age': '2 anos',
+      'description': 'Bella é uma cachorrinha dócil e muito sociável.',
+      'image': 'assets/images/pet10.jpeg'
+    },
+    {
+      'name': 'Nina',
+      'age': '9 anos',
+      'description': 'Nina é uma gatinha curiosa e cheia de energia.',
+      'image': 'assets/images/pet12.jpeg'
+    },
   ];
 
   @override

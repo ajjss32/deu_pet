@@ -17,7 +17,7 @@ class _ChatScreenState extends State<ChatScreen>
 
     // Inicializa o controlador de animação
     _controller = AnimationController(
-      duration: Duration(seconds: 2),
+      duration: Duration(seconds: 3),
       vsync: this,
     )..forward(); // Inicia a animação uma vez, sem repetição
     ; // Faz a animação repetir continuamente
