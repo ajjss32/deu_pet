@@ -1,120 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:deu_pet/pages/user_registration.dart';
+import 'package:deu_pet/pages/profile_page.dart';
+import 'package:deu_pet/pages/login_page.dart';
+import 'package:deu_pet/pages/login_signupp_page.dart';
 import 'package:deu_pet/pages/pet_registration.dart';
 import 'package:deu_pet/pages/pet_lista.dart';
+import 'package:deu_pet/services/auth_service.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-
-class UserTypePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: Colors.white, // Fundo branco para todo o body
-        child: Column(
-          children: [
-            // Primeira parte: imagem de fundo (foto)
-            SizedBox(
-              height: 90, // Espaçamento para descer a imagem
-            ),
-            Container(
-              width: double.infinity,
-              height: 400,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/Background.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-
-            // Segunda parte: texto com botões
-            Container(
-              padding: EdgeInsets.all(40),
-              width: double.infinity,
-              color: Colors.white,
-              child: Column(
-                children: [
-                  Text(
-                    "Selecione seu Tipo de Usuário",
-                    style: TextStyle(fontSize: 25),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 40),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  HomeScreen(userType: 'adotante'),
-                            ),
-                          );
-                        },
-                        child: Text("Adotante"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(
-                              255, 85, 16, 224), // Cor de fundo roxa
-                          foregroundColor: Colors.white, // Cor do texto branca
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          textStyle: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  HomeScreen(userType: 'voluntario'),
-                            ),
-                          );
-                        },
-                        child: Text("Voluntário"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(
-                              255, 85, 16, 224), // Cor de fundo roxa
-                          foregroundColor: Colors.white, // Cor do texto branca
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 15),
-                          textStyle: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 60),
-                ],
-              ),
-            ),
-
-            // Espaço entre o conteúdo e o logo
-            Spacer(),
-
-            // Logo no final da página
-            Padding(
-              padding: EdgeInsets.only(bottom: 20), // Adiciona margem inferior
-              child: Image.asset(
-                'assets/logo.png',
-                width: 50,
-                height: 50,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'package:deu_pet/model/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -132,31 +31,33 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: UserTypePage(), // Tela inicial para escolher o tipo de usuário
+      home: LoginPage(),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
-  final String userType; // Recebe o tipo de usuário como parâmetro
+  final String userType;
 
   HomeScreen({required this.userType});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState(userType: userType);
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final String userType;
+
+  _HomeScreenState({required this.userType});
+
   int _selectedIndex = 0;
 
-  // Função que é chamada ao tocar em um item do BottomNavigationBar
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  // Função que retorna o conteúdo baseado no índice selecionado e no tipo de usuário
   Widget _buildContent() {
     if (widget.userType == 'adotante') {
       // Conteúdo para Adotante
@@ -164,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
         case 0:
           return SwipeCard(showFavorites: _goToFavorites);
         case 1:
-          return RegistrationPage();
+          return FavoritePage();
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
-          return _buildProfilePage();
+          return ProfilePage();
         default:
           return Center(child: Text('Página desconhecida'));
       }
@@ -182,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
-          return _buildProfilePage();
+          return ProfilePage();
         default:
           return Center(child: Text('Página desconhecida'));
       }
@@ -190,45 +91,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return Center(child: Text('Tipo de usuário desconhecido'));
   }
 
-  // Função para alterar o índice para a aba Favoritos
   void _goToFavorites() {
     setState(() {
-      _selectedIndex = 1; // Define o índice da aba Favoritos
+      _selectedIndex = 1;
     });
-  }
-
-  Widget _buildProfilePage() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => UserTypePage()),
-              );
-            },
-            child: Text('Sair'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              textStyle: TextStyle(fontSize: 18),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      body: _buildContent(), // Exibe o conteúdo com base no índice selecionado
-      bottomNavigationBar: widget.userType == 'adotante'
+      body: _buildContent(),
+      bottomNavigationBar: userType == 'adotante'
           ? CustomBottomNavBar(
               selectedIndex: _selectedIndex,
               onItemTapped: _onItemTapped,

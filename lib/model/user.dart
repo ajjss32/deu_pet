@@ -1,4 +1,5 @@
 class Usuario {
+  String uid;
   String id;
   String email;
   String foto;
@@ -12,6 +13,7 @@ class Usuario {
   DateTime dataAtualizacao;
 
   Usuario({
+    required this.uid,
     required this.id,
     required this.email,
     required this.foto,
@@ -27,6 +29,7 @@ class Usuario {
 
   Map<String, dynamic> toMap() {
     return {
+      'uid': uid,
       'email': email,
       'foto': foto,
       'tipo': tipo,
@@ -40,8 +43,9 @@ class Usuario {
     };
   }
 
-  factory Usuario.fromMap(String id, Map<String, dynamic> map) {
+  factory Usuario.fromMap(String uid, String id, Map<String, dynamic> map) {
     return Usuario(
+      uid: uid,
       id: id,
       email: map['email'],
       foto: map['foto'],

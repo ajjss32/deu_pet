@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:deu_pet/services/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/pages/login_page.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -19,12 +21,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _telefoneController = TextEditingController();
   final TextEditingController _enderecoController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
-  final TextEditingController _dataNascimentoController = TextEditingController();
+  final TextEditingController _dataNascimentoController =
+      TextEditingController();
   final TextEditingController _cpfCnpjController = TextEditingController();
-  String? _selectedTipo; // Para armazenar o tipo selecionado
+  String? _selectedTipo;
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
-  AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
   final UsuarioService _usuarioService = UsuarioService();
 
   Future<void> _pickImage() async {
@@ -39,152 +42,209 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Registration")),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "Email"),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Por favor, coloque um email válido!";
-                  }
-                  return null;
-                },
+              Center(
+                child: Column(
+                  children: [
+                    SizedBox(height: 80),
+                    Text(
+                      "Crie uma conta",
+                      style: TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF4E59D9),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "Cadastre-se para encontrar e adotar um pet!",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: InputDecoration(labelText: "Password"),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.length < 6) {
-                    return "A senha deve conter no mínimo 6 caracteres";
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: "Name"),
-                validator: (value) => value!.isEmpty ? "Enter a name" : null,
-              ),
-              TextFormField(
-                controller: _telefoneController,
-                decoration: InputDecoration(labelText: "Telefone"),
-                validator: (value) => value!.isEmpty ? "Enter a phone number" : null,
-              ),
-              TextFormField(
-                controller: _enderecoController,
-                decoration: InputDecoration(labelText: "Endereço"),
-                validator: (value) => value!.isEmpty ? "Enter an address" : null,
-              ),
-              TextFormField(
-                controller: _descricaoController,
-                decoration: InputDecoration(labelText: "Descrição"),
-                validator: (value) => value!.isEmpty ? "Enter a description" : null,
-              ),
-              TextFormField(
-                controller: _dataNascimentoController,
-                decoration: InputDecoration(labelText: "Data de Nascimento"),
-                validator: (value) => value!.isEmpty ? "Enter a birth date" : null,
-              ),
-              TextFormField(
-                controller: _cpfCnpjController,
-                decoration: InputDecoration(labelText: "CPF/CNPJ"),
-                validator: (value) => value!.isEmpty ? "Enter a CPF or CNPJ" : null,
-              ),
+              SizedBox(height: 20),
+              _buildTextField(_nameController, "Nome", Icons.person),
+              _buildTextField(_emailController, "Email", Icons.email,
+                  keyboardType: TextInputType.emailAddress),
+              _buildTextField(_telefoneController, "Telefone", Icons.phone,
+                  keyboardType: TextInputType.phone),
+              _buildTextField(_enderecoController, "Endereço", Icons.home),
+              _buildTextField(_descricaoController, "Descrição", Icons.info),
+              _buildTextField(_dataNascimentoController, "Data de Nascimento",
+                  Icons.calendar_today),
+              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge),
               DropdownButtonFormField<String>(
                 value: _selectedTipo,
-                decoration: InputDecoration(labelText: "Tipo"),
+                decoration: InputDecoration(
+                  labelText: "Tipo",
+                  border: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+                  ),
+                  prefixIcon: Icon(Icons.category),
+                ),
                 items: [
                   DropdownMenuItem(value: "adotante", child: Text("Adotante")),
-                  DropdownMenuItem(value: "voluntario", child: Text("Voluntário")),
+                  DropdownMenuItem(
+                      value: "voluntario", child: Text("Voluntário")),
                 ],
                 onChanged: (value) {
                   setState(() {
                     _selectedTipo = value;
                   });
                 },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Selecione um tipo";
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    value == null ? "Selecione um tipo" : null,
               ),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: _pickImage,
-                child: _selectedImage == null
-                    ? Container(
-                        height: 150,
-                        width: 150,
-                        color: Colors.grey[300],
-                        child: Icon(Icons.camera_alt, size: 50),
-                      )
-                    : Image.file(
-                        _selectedImage!,
-                        height: 150,
-                        width: 150,
-                        fit: BoxFit.cover,
-                      ),
-              ),
+              _buildTextField(_passwordController, "Senha", Icons.lock,
+                  obscureText: true),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Cadastrando...")),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(300, 50),
+                  backgroundColor: Color(0xFF50BB88),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: _registerUser,
+                child: Center(
+                  child: Text(
+                    "Cadastrar",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()),
                     );
-                    try {
-                      // Converter a imagem para base64
-                      String? fotoBase64;
-                      if (_selectedImage != null) {
-                        fotoBase64 = base64Encode(_selectedImage!.readAsBytesSync());
-                      }
-
-                      Usuario novoUsuario = Usuario(
-                        id: _cpfCnpjController.text,
-                        email: _emailController.text,
-                        foto: fotoBase64 ?? "",
-                        tipo: _selectedTipo ?? "",
-                        nome: _nameController.text,
-                        telefone: _telefoneController.text,
-                        endereco: _enderecoController.text,
-                        descricao: _descricaoController.text,
-                        dataNascimento: _dataNascimentoController.text,
-                        dataCriacao: DateTime.now(),
-                        dataAtualizacao: DateTime.now(),
-                      );
-
-                      await _usuarioService.criarUsuario(novoUsuario);
-
-                      _authService.userRegistration(
-                        name: _nameController.text,
-                        password: _passwordController.text,
-                        email: _emailController.text);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Usuário cadastrado com sucesso!")),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Erro ao cadastrar usuário: $e")),
-                      );
-                    }
-                  }
-                },
-                child: Text("Cadastrar"),
+                  },
+                  child: Text(
+                    "Já tem uma conta? Entrar",
+                    style: TextStyle(color: Colors.grey), // Define a cor cinza
+                  ),
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon,
+      {bool obscureText = false,
+      TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFCCCCCE), width: 0.5),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red, width: 2.0),
+          ),
+          prefixIcon: Icon(icon),
+        ),
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
+      ),
+    );
+  }
+
+  Future<void> _registerUser() async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Cadastrando...")),
+      );
+
+      try {
+        // Converte a imagem para Base64, se existir
+        String? fotoBase64;
+        if (_selectedImage != null) {
+          fotoBase64 = base64Encode(_selectedImage!.readAsBytesSync());
+        }
+
+        // Cria o usuário no Firebase Auth e obtém o UID
+        UserCredential userCredential = await _authService.userRegistration(
+          name: _nameController.text,
+          password: _passwordController.text,
+          email: _emailController.text,
+        );
+
+        String uid = userCredential.user!.uid; // Obtém o UID do usuário
+
+        // Criar objeto usuário com UID correto
+        Usuario novoUsuario = Usuario(
+          uid: uid, // UID vindo do Firebase Auth
+          id: _cpfCnpjController.text,
+          email: _emailController.text,
+          foto: fotoBase64 ?? "",
+          tipo: _selectedTipo ?? "",
+          nome: _nameController.text,
+          telefone: _telefoneController.text,
+          endereco: _enderecoController.text,
+          descricao: _descricaoController.text,
+          dataNascimento: _dataNascimentoController.text,
+          dataCriacao: DateTime.now(),
+          dataAtualizacao: DateTime.now(),
+        );
+
+        // Salva o usuário no Firestore com o UID correto
+        await _usuarioService.criarUsuario(novoUsuario);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Usuário cadastrado com sucesso!")),
+        );
+
+        // Navega para a tela de login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao cadastrar usuário: $e")),
+        );
+      }
+    }
   }
 }

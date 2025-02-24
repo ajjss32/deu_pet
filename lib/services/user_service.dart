@@ -14,18 +14,6 @@ class UsuarioService {
     }
   }
 
-  Future<Usuario?> buscarUsuario(String id) async {
-    try {
-      DocumentSnapshot doc = await usuariosCollection.doc(id).get();
-      if (doc.exists) {
-        return Usuario.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-      }
-    } catch (e) {
-      print('Erro ao buscar usuário: $e');
-    }
-    return null;
-  }
-
   Future<void> atualizarUsuario(Usuario usuario) async {
     try {
       usuario.dataAtualizacao = DateTime.now();
@@ -42,6 +30,44 @@ class UsuarioService {
       print('Usuário deletado com sucesso!');
     } catch (e) {
       print('Erro ao deletar usuário: $e');
+    }
+  }
+
+  Future<Usuario?> buscarUsuarioPorUid(String uid) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await usuariosCollection.where('uid', isEqualTo: uid).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var doc = querySnapshot.docs.first;
+        Usuario usuario =
+            Usuario.fromMap(uid, doc.id, doc.data() as Map<String, dynamic>);
+        return usuario;
+      } else {
+        print('Usuário não encontrado');
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao buscar usuário: $e');
+      return null;
+    }
+  }
+
+  Future<String?> obterTipoUsuario(String uid) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await usuariosCollection.where('uid', isEqualTo: uid).get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var doc = querySnapshot.docs.first;
+        return doc['tipo'] as String?;
+      } else {
+        print('Usuário não encontrado');
+        return null;
+      }
+    } catch (e) {
+      print('Erro ao obter tipo de usuário: $e');
+      return null;
     }
   }
 }
