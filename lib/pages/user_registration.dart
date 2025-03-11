@@ -7,6 +7,7 @@ import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
+import 'package:deu_pet/utils/validators.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -84,7 +85,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
               _buildTextField(_descricaoController, "Descrição", Icons.info),
               _buildTextField(_dataNascimentoController, "Data de Nascimento",
                   Icons.calendar_today),
-              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge),
+              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge,
+                  validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Campo obrigatório";
+                }
+                if (!Validators.validarCPF(value) &&
+                    !Validators.validarCNPJ(value)) {
+                  return "CPF ou CNPJ inválido";
+                }
+                return null;
+              }),
               DropdownButtonFormField<String>(
                 value: _selectedTipo,
                 decoration: InputDecoration(
@@ -162,7 +173,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget _buildTextField(
       TextEditingController controller, String label, IconData icon,
       {bool obscureText = false,
-      TextInputType keyboardType = TextInputType.text}) {
+      TextInputType keyboardType = TextInputType.text,
+      String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -185,7 +197,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
         obscureText: obscureText,
         keyboardType: keyboardType,
-        validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
+        validator:
+            validator ?? (value) => value!.isEmpty ? "Campo obrigatório" : null,
       ),
     );
   }
