@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
-import 'package:deu_pet/pages/user_registration.dart';
 import 'package:deu_pet/pages/profile_page.dart';
 import 'package:deu_pet/pages/login_page.dart';
-import 'package:deu_pet/pages/login_signupp_page.dart';
 import 'package:deu_pet/pages/pet_registration.dart';
 import 'package:deu_pet/pages/pet_lista.dart';
-import 'package:deu_pet/services/auth_service.dart';
 import 'components/custom_app_bar.dart';
 import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
 import 'firebase_options.dart';
-import 'package:deu_pet/model/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

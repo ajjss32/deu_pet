@@ -215,7 +215,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         // Criar objeto usuário com UID correto
         Usuario novoUsuario = Usuario(
           uid: uid, // UID vindo do Firebase Auth
-          id: _cpfCnpjController.text,
+          cpf_cnpj: _cpfCnpjController.text,
           email: _emailController.text,
           foto: fotoBase64 ?? "",
           tipo: _selectedTipo ?? "",

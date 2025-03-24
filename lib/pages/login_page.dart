@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/pages/user_registration.dart';
-import 'package:deu_pet/pages/profile_page.dart';
 import 'package:deu_pet/main.dart';
 import 'package:deu_pet/services/user_service.dart';
 

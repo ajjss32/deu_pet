@@ -7,7 +7,7 @@ class UsuarioService {
 
   Future<void> criarUsuario(Usuario usuario) async {
     try {
-      await usuariosCollection.doc(usuario.id).set(usuario.toMap());
+      await usuariosCollection.doc(usuario.cpf_cnpj).set(usuario.toMap());
       print('Usuário criado com sucesso!');
     } catch (e) {
       print('Erro ao criar usuário: $e');
@@ -17,7 +17,7 @@ class UsuarioService {
   Future<void> atualizarUsuario(Usuario usuario) async {
     try {
       usuario.dataAtualizacao = DateTime.now();
-      await usuariosCollection.doc(usuario.id).update(usuario.toMap());
+      await usuariosCollection.doc(usuario.cpf_cnpj).update(usuario.toMap());
       print('Usuário atualizado com sucesso!');
     } catch (e) {
       print('Erro ao atualizar usuário: $e');
@@ -41,7 +41,7 @@ class UsuarioService {
       if (querySnapshot.docs.isNotEmpty) {
         var doc = querySnapshot.docs.first;
         Usuario usuario =
-            Usuario.fromMap(uid, doc.id, doc.data() as Map<String, dynamic>);
+            Usuario.fromMap(uid, doc.data() as Map<String, dynamic>);
         return usuario;
       } else {
         print('Usuário não encontrado');
