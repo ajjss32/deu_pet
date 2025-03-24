@@ -7,6 +7,8 @@ import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
+import 'package:deu_pet/services/validators.dart';
+import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -19,7 +21,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _telefoneController = TextEditingController();
-  final TextEditingController _enderecoController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
+  final TextEditingController _logradouroController = TextEditingController();
+  final TextEditingController _bairroController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
   final TextEditingController _dataNascimentoController =
       TextEditingController();
@@ -36,6 +42,26 @@ class _RegistrationPageState extends State<RegistrationPage> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
+    }
+  }
+
+  Future<void> _buscarCEP() async {
+    try {
+      // Busca os dados do CEP usando o CEPService
+      final endereco = await CEPService.buscarCEP(_cepController.text);
+
+      // Preenche os campos com os dados retornados
+      setState(() {
+        _logradouroController.text = endereco['logradouro'] ?? '';
+        _bairroController.text = endereco['bairro'] ?? '';
+        _cidadeController.text = endereco['localidade'] ?? '';
+        _estadoController.text = endereco['uf'] ?? '';
+      });
+    } catch (e) {
+      // Exibe uma mensagem de erro
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 
@@ -80,11 +106,49 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   keyboardType: TextInputType.emailAddress),
               _buildTextField(_telefoneController, "Telefone", Icons.phone,
                   keyboardType: TextInputType.phone),
-              _buildTextField(_enderecoController, "Endereço", Icons.home),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: _buildTextField(
+                        _cepController, "CEP", Icons.location_on,
+                        keyboardType: TextInputType.number),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    flex: 1,
+                    child: ElevatedButton(
+                      onPressed: _buscarCEP,
+                      child: Text("Buscar"),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              _buildTextField(_logradouroController, "Logradouro", Icons.place,
+                  enabled: false),
+              _buildTextField(_bairroController, "Bairro", Icons.place,
+                  enabled: false),
+              _buildTextField(_cidadeController, "Cidade", Icons.location_city,
+                  enabled: false),
+              _buildTextField(_estadoController, "Estado", Icons.flag,
+                  enabled: false),
               _buildTextField(_descricaoController, "Descrição", Icons.info),
               _buildTextField(_dataNascimentoController, "Data de Nascimento",
                   Icons.calendar_today),
-              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge),
+              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge,
+                  validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return "Campo obrigatório";
+                }
+                if (!Validators.validarCPF(value) &&
+                    !Validators.validarCNPJ(value)) {
+                  return "CPF ou CNPJ inválido";
+                }
+                return null;
+              }),
               DropdownButtonFormField<String>(
                 value: _selectedTipo,
                 decoration: InputDecoration(
@@ -162,7 +226,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget _buildTextField(
       TextEditingController controller, String label, IconData icon,
       {bool obscureText = false,
-      TextInputType keyboardType = TextInputType.text}) {
+      TextInputType keyboardType = TextInputType.text,
+      bool enabled = true,
+      String? Function(String?)? validator}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -185,7 +251,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
         obscureText: obscureText,
         keyboardType: keyboardType,
-        validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
+        enabled: enabled,
+        validator:
+            validator ?? (value) => value!.isEmpty ? "Campo obrigatório" : null,
       ),
     );
   }
@@ -221,7 +289,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           tipo: _selectedTipo ?? "",
           nome: _nameController.text,
           telefone: _telefoneController.text,
-          endereco: _enderecoController.text,
+          endereco:
+              "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
           descricao: _descricaoController.text,
           dataNascimento: _dataNascimentoController.text,
           dataCriacao: DateTime.now(),

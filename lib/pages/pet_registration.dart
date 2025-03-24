@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:deu_pet/services/pet_service.dart';
 import 'package:deu_pet/model/pet.dart';
+import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
 
 class PetRegistration extends StatefulWidget {
   @override
@@ -16,7 +17,11 @@ class _PetRegistrationState extends State<PetRegistration> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _healthController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _cepController = TextEditingController();
+  final TextEditingController _logradouroController = TextEditingController();
+  final TextEditingController _bairroController = TextEditingController();
+  final TextEditingController _cidadeController = TextEditingController();
+  final TextEditingController _estadoController = TextEditingController();
   final TextEditingController _specialNeedsController = TextEditingController();
   final TextEditingController _historyController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
@@ -38,11 +43,35 @@ class _PetRegistrationState extends State<PetRegistration> {
     }
   }
 
+  Future<void> _buscarCEP() async {
+    try {
+      // Busca os dados do CEP usando o CEPService
+      final endereco = await CEPService.buscarCEP(_cepController.text);
+
+      // Preenche os campos com os dados retornados
+      setState(() {
+        _logradouroController.text = endereco['logradouro'] ?? '';
+        _bairroController.text = endereco['bairro'] ?? '';
+        _cidadeController.text = endereco['localidade'] ?? '';
+        _estadoController.text = endereco['uf'] ?? '';
+      });
+    } catch (e) {
+      // Exibe uma mensagem de erro
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
   void _clearFields() {
     _nameController.clear();
     _ageController.clear();
     _healthController.clear();
-    _locationController.clear();
+    _cepController.clear();
+    _logradouroController.clear();
+    _bairroController.clear();
+    _cidadeController.clear();
+    _estadoController.clear();
     _specialNeedsController.clear();
     _historyController.clear();
     _speciesController.clear();
@@ -142,11 +171,13 @@ class _PetRegistrationState extends State<PetRegistration> {
           sexo: _selectedSex ?? "",
           temperamento: _selectedTemperament ?? "",
           estadoDeSaude: _healthController.text,
-          endereco: _locationController.text,
+          endereco:
+              "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
           necessidades: _specialNeedsController.text,
           historia: _historyController.text,
           status: "Disponível",
-          voluntarioId: "voluntarioIdAqui", // Substitua pelo ID do voluntário logado
+          voluntarioId:
+              "voluntarioIdAqui", // Substitua pelo ID do voluntário logado
           dataCriacao: DateTime.now(),
           dataAtualizacao: DateTime.now(),
         );
@@ -161,7 +192,8 @@ class _PetRegistrationState extends State<PetRegistration> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor, preencha todos os campos corretamente.')),
+        SnackBar(
+            content: Text('Por favor, preencha todos os campos corretamente.')),
       );
     }
   }
@@ -314,13 +346,67 @@ class _PetRegistrationState extends State<PetRegistration> {
                 validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      controller: _cepController,
+                      decoration: InputDecoration(
+                        labelText: 'CEP',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: _validateRequiredField,
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    flex: 1,
+                    child: ElevatedButton(
+                      onPressed: _buscarCEP,
+                      child: Text("Buscar"),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
               TextFormField(
-                controller: _locationController,
+                controller: _logradouroController,
                 decoration: InputDecoration(
-                  labelText: 'Localização',
+                  labelText: 'Logradouro',
                   border: OutlineInputBorder(),
                 ),
-                validator: _validateRequiredField,
+                enabled: false,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _bairroController,
+                decoration: InputDecoration(
+                  labelText: 'Bairro',
+                  border: OutlineInputBorder(),
+                ),
+                enabled: false,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _cidadeController,
+                decoration: InputDecoration(
+                  labelText: 'Cidade',
+                  border: OutlineInputBorder(),
+                ),
+                enabled: false,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _estadoController,
+                decoration: InputDecoration(
+                  labelText: 'Estado',
+                  border: OutlineInputBorder(),
+                ),
+                enabled: false,
               ),
               SizedBox(height: 20),
               TextFormField(
