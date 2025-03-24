@@ -30,7 +30,7 @@ class Usuario {
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
-      'cpf_cpnj': cpf_cnpj,
+      'cpf_cnpj': cpf_cnpj,
       'email': email,
       'foto': foto,
       'tipo': tipo,
