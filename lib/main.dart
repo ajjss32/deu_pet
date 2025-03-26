@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:deu_pet/pages/profile_page.dart';
 import 'package:deu_pet/pages/login_page.dart';
@@ -16,6 +17,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Teste: adiciona um documento ao Firestore
+  FirebaseFirestore.instance.collection('test').add({
+    'message': 'Firebase está funcionando!',
+    'timestamp': DateTime.now(),
+  });
+
   runApp(MyApp());
 }
 
@@ -43,10 +51,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final String userType;
+  int _selectedIndex = 0;
 
   _HomeScreenState({required this.userType});
-
-  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -55,8 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContent() {
-    if (widget.userType == 'adotante') {
-      // Conteúdo para Adotante
+    if (userType == 'adotante') {
       switch (_selectedIndex) {
         case 0:
           return SwipeCard(showFavorites: _goToFavorites);
@@ -69,13 +75,12 @@ class _HomeScreenState extends State<HomeScreen> {
         default:
           return Center(child: Text('Página desconhecida'));
       }
-    } else if (widget.userType == 'voluntario') {
-      // Conteúdo para Voluntário/Ong
+    } else if (userType == 'voluntario') {
       switch (_selectedIndex) {
         case 0:
-          return PetRegistration(); // Cadastro de animal
+          return PetRegistration();
         case 1:
-          return PetListScreen(); // Listagem de animais
+          return PetListScreen();
         case 2:
           return Center(child: Text('Chat Página'));
         case 3:
