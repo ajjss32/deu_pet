@@ -1,11 +1,18 @@
+import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/chat_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/pages/user_registration.dart';
 import 'package:deu_pet/main.dart';
 import 'package:deu_pet/services/user_service.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart' as stream_chat;
 
 class LoginPage extends StatefulWidget {
+  final stream_chat.StreamChatClient client;
+
+  LoginPage({required this.client});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -16,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   final UsuarioService _userService = UsuarioService();
+  final ChatService _chatService = ChatService();
 
   get userType => null;
 
@@ -83,7 +91,8 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegistrationPage()),
+                              builder: (context) =>
+                                  RegistrationPage(client: widget.client)),
                         );
                       },
                       child: Text(
@@ -158,10 +167,20 @@ class _LoginPageState extends State<LoginPage> {
           String? userType = await _userService.obterTipoUsuario(uid);
 
           if (userType != null) {
+            // Recupera os dados do usuário do banco de dados
+            Usuario? usuario = await _userService.buscarUsuarioPorUid(uid);
+
+            // Obtem o token
+            final token = await _fetchStreamToken(usuario!);
+
+            // Conecta o usuário ao Stream Chat
+            await connectToStreamChat(usuario, widget.client, token);
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(userType: userType),
+                builder: (context) =>
+                    HomeScreen(userType: userType, client: widget.client),
               ),
             );
           } else {
@@ -176,5 +195,34 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     }
+  }
+
+  Future<void> connectToStreamChat(Usuario usuario,
+      stream_chat.StreamChatClient client, String token) async {
+    await Future.delayed(Duration(seconds: 2));
+    await client.connectUser(
+      stream_chat.User(
+        id: usuario.uid,
+        extraData: {
+          'name': usuario.nome,
+          'image': usuario.foto,
+          'email': usuario.email,
+          'tipo': usuario.tipo,
+        },
+      ),
+      token,
+    );
+  }
+
+  Future<String> _fetchStreamToken(Usuario usuario) async {
+    final payload = {
+      'user_id': usuario.uid,
+      ...usuario.toMap(),
+    };
+
+    final token = await _chatService.gerarTokenJWT(
+        '5ybdnxv26rnu8waqrqtapfgptuuu3bhqpg245nfegdcdtd2zarzr57yty9bc63mk',
+        payload);
+    return token;
   }
 }

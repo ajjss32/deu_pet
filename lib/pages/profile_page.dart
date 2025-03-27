@@ -1,10 +1,16 @@
+import 'package:deu_pet/services/chat_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:deu_pet/pages/login_page.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/model/user.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
+    final StreamChatClient client;
+
+  ProfilePage({required this.client}); 
+  
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -76,11 +82,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Spacer(),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    await ChatService().disconnectStreamChat(widget.client);
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginPage(),
+                        builder: (context) => LoginPage(client: widget.client),
                       ),
                     );
                   },

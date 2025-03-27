@@ -9,8 +9,13 @@ import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
 import 'package:deu_pet/services/validators.dart';
 import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
+import 'package:stream_chat_flutter/stream_chat_flutter.dart'; 
 
 class RegistrationPage extends StatefulWidget {
+  final StreamChatClient client;
+
+  RegistrationPage({required this.client}); 
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -207,7 +212,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage()),
+                      MaterialPageRoute(builder: (context) => LoginPage(client: widget.client)),
                     );
                   },
                   child: Text(
@@ -307,7 +312,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         // Navega para a tela de login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(builder: (context) => LoginPage(client: widget.client)),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

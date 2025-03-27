@@ -1,3 +1,4 @@
+import 'package:deu_pet/pages/chat/chat_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
@@ -10,16 +11,27 @@ import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
 import 'firebase_options.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+
+  final StreamChatClient client = StreamChatClient(
+    'gjp3ycatuazs',
+    logLevel: Level.INFO,
+  );
+
+  runApp(MyApp(client: client));
 }
 
 class MyApp extends StatelessWidget {
+  final StreamChatClient client;
+
+  MyApp({required this.client});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,24 +39,34 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginPage(),
+      builder: (context, child) {
+        return StreamChat(
+          client: client,
+          streamChatThemeData: StreamChatThemeData.light(),
+          child: child!,
+          
+        );
+      },
+      home: LoginPage(client: client),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
   final String userType;
+  final StreamChatClient client;
 
-  HomeScreen({required this.userType});
+  HomeScreen({required this.userType, required this.client});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState(userType: userType);
+  _HomeScreenState createState() => _HomeScreenState(userType: userType, client: client);
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final String userType;
+  final StreamChatClient client;
 
-  _HomeScreenState({required this.userType});
+  _HomeScreenState({required this.userType, required this.client});
 
   int _selectedIndex = 0;
 
@@ -63,9 +85,9 @@ class _HomeScreenState extends State<HomeScreen> {
         case 1:
           return FavoritePage();
         case 2:
-          return Center(child: Text('Chat Página'));
+          return ChannelListPage(client: client);
         case 3:
-          return ProfilePage();
+          return ProfilePage(client: client);
         default:
           return Center(child: Text('Página desconhecida'));
       }
@@ -77,9 +99,9 @@ class _HomeScreenState extends State<HomeScreen> {
         case 1:
           return PetListScreen(); // Listagem de animais
         case 2:
-          return Center(child: Text('Chat Página'));
+          return ChannelListPage(client: client);
         case 3:
-          return ProfilePage();
+          return ProfilePage(client: client);
         default:
           return Center(child: Text('Página desconhecida'));
       }
