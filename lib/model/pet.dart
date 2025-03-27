@@ -11,7 +11,7 @@ class Pet {
   String necessidades;
   String historia;
   String status;
-  String voluntarioId;
+  String voluntarioUid;
   DateTime dataCriacao;
   DateTime dataAtualizacao;
 
@@ -28,7 +28,7 @@ class Pet {
     required this.necessidades,
     required this.historia,
     required this.status,
-    required this.voluntarioId,
+    required this.voluntarioUid,
     required this.dataCriacao,
     required this.dataAtualizacao,
   });
@@ -46,7 +46,7 @@ class Pet {
       'necessidades': necessidades,
       'historia': historia,
       'status': status,
-      'voluntario_id': voluntarioId,
+      'voluntario_uid': voluntarioUid,
       'data_criacao': dataCriacao.toIso8601String(),
       'data_atualizacao': dataAtualizacao.toIso8601String(),
     };
@@ -66,7 +66,7 @@ class Pet {
       necessidades: map['necessidades'],
       historia: map['historia'],
       status: map['status'],
-      voluntarioId: map['voluntario_id'],
+      voluntarioUid: map['voluntario_uid'],
       dataCriacao: DateTime.parse(map['data_criacao']),
       dataAtualizacao: DateTime.parse(map['data_atualizacao']),
     );

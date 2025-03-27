@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -157,7 +158,7 @@ class _PetRegistrationState extends State<PetRegistration> {
     int age = today.year - birthdate.year;
     if (today.month < birthdate.month ||
         (today.month == birthdate.month && today.day < birthdate.day)) {
-      age -= 1; 
+      age -= 1;
     }
     return age;
   }
@@ -165,6 +166,13 @@ class _PetRegistrationState extends State<PetRegistration> {
   void _registerPet() async {
     if (_formKey.currentState!.validate()) {
       try {
+        final User? user = FirebaseAuth.instance.currentUser;
+        final String? userUid = user?.uid;
+
+        if (userUid == null) {
+          throw Exception("Usuário não está logado.");
+        }
+
         String petId = Uuid().v4();
 
         // Converter a imagem para base64
@@ -187,11 +195,12 @@ class _PetRegistrationState extends State<PetRegistration> {
           sexo: _selectedSex ?? "",
           temperamento: _selectedTemperament ?? "",
           estadoDeSaude: _healthController.text,
-          endereco: "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
+          endereco:
+              "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
           necessidades: _specialNeeds ?? "", // Utilizando a nova variável
           historia: _historyController.text,
           status: "Disponível",
-          voluntarioId: "voluntarioIdAqui",
+          voluntarioUid: userUid,
           dataCriacao: DateTime.now(),
           dataAtualizacao: DateTime.now(),
         );
