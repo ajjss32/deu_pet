@@ -199,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> connectToStreamChat(Usuario usuario,
       stream_chat.StreamChatClient client, String token) async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 3));
     await client.connectUser(
       stream_chat.User(
         id: usuario.uid,

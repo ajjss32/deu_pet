@@ -1,6 +1,7 @@
 import 'package:deu_pet/pages/chat/chat_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:deu_pet/pages/profile_page.dart';
 import 'package:deu_pet/pages/login_page.dart';
@@ -77,8 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContent() {
-    if (widget.userType == 'adotante') {
-      // Conteúdo para Adotante
+    if (userType == 'adotante') {
       switch (_selectedIndex) {
         case 0:
           return SwipeCard(showFavorites: _goToFavorites);
@@ -91,13 +91,12 @@ class _HomeScreenState extends State<HomeScreen> {
         default:
           return Center(child: Text('Página desconhecida'));
       }
-    } else if (widget.userType == 'voluntario') {
-      // Conteúdo para Voluntário/Ong
+    } else if (userType == 'voluntario') {
       switch (_selectedIndex) {
         case 0:
-          return PetRegistration(); // Cadastro de animal
+          return PetRegistration();
         case 1:
-          return PetListScreen(); // Listagem de animais
+          return PetListScreen();
         case 2:
           return ChannelListPage(client: client);
         case 3:
