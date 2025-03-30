@@ -1,5 +1,10 @@
+import 'package:deu_pet/model/favorito.dart';
+import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/auth_service.dart';
+import 'package:deu_pet/services/favorito_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class SwipeCard extends StatefulWidget {
   final VoidCallback showFavorites; // Função passada pela HomeScreen
@@ -12,55 +17,65 @@ class SwipeCard extends StatefulWidget {
 
 class _SwipeCardState extends State<SwipeCard> {
   final CardSwiperController controller = CardSwiperController();
+  final FavoritoService favoritoService = FavoritoService();
+  final AuthService authService = AuthService();
 
   final List<Map<String, String>> _pets = [
     {
       'name': 'Bob',
       'age': '2 anos',
       'description': 'Bob é um gato amigável e cheio de energia.',
-      'image': 'assets/images/pet1.png'
+      'image': 'assets/images/pet1.png',
+      'id': '1',
     },
     {
       'name': 'Thor',
       'age': '3 anos',
       'description': 'Thor adora aventuras ao ar livre e corridas.',
-      'image': 'assets/images/pet3.jpg'
+      'image': 'assets/images/pet3.jpg',
+      'id': '2',
     },
     {
       'name': 'Luna',
       'age': '1 ano',
       'description': 'Luna é uma cadelinha carinhosa e adora brincar.',
-      'image': 'assets/images/pet4.jpg'
+      'image': 'assets/images/pet4.jpg',
+      'id': '3',
     },
     {
       'name': 'Max',
       'age': '4 anos',
       'description': 'Max é um cachorro protetor e muito leal.',
-      'image': 'assets/images/pet5.jpg'
+      'image': 'assets/images/pet5.jpg',
+      'id': '4',
     },
     {
       'name': 'Mia',
       'age': '3 anos',
       'description': 'Mia é uma cadelinha elegante que adora relaxar.',
-      'image': 'assets/images/pet6.jpg'
+      'image': 'assets/images/pet6.jpg',
+      'id': '5',
     },
     {
       'name': 'Zeca',
       'age': '5 anos',
       'description': 'Zeca é um gato esperto que ama desafios.',
-      'image': 'assets/images/pet9.png'
+      'image': 'assets/images/pet9.png',
+      'id': '6',
     },
     {
       'name': 'Bella',
       'age': '2 anos',
       'description': 'Bella é uma cachorrinha dócil e muito sociável.',
-      'image': 'assets/images/pet10.jpeg'
+      'image': 'assets/images/pet10.jpeg',
+      'id': '7',
     },
     {
       'name': 'Nina',
       'age': '9 anos',
       'description': 'Nina é uma gatinha curiosa e cheia de energia.',
-      'image': 'assets/images/pet12.jpeg'
+      'image': 'assets/images/pet12.jpeg',
+      'id': '8',
     },
   ];
 
@@ -163,7 +178,21 @@ class _SwipeCardState extends State<SwipeCard> {
                         child: _buildIconButton(
                           icon: Icons.favorite,
                           color: Color(0xFF20ECB9),
-                          onPressed: () {
+                          onPressed: () async {
+                            final Usuario? usuario =
+                                await authService.getUsuarioLogado();
+
+                            if (usuario == null) {
+                              return;
+                            }
+
+                            favoritoService.criarFavorito(
+                              Favorito(
+                                id: Uuid().v1(),
+                                usuarioId: usuario.uid,
+                                petId: pet['id']!,
+                              ),
+                            );
                             controller.swipe(CardSwiperDirection.right);
                             // A chamada para _showFavoriteDialog foi removida
                           },
