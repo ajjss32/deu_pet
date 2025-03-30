@@ -1,33 +1,62 @@
+import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/favorito_service.dart';
 import 'package:flutter/material.dart';
 import 'deu_pet_page.dart'; // Importa a tela de chat
 
-class SeeInterestedPage extends StatelessWidget {
-  // Lista de interessados com suas informações
-  final List<Map<String, String>> interestedPeople = [
-    {
-      'name': 'Maria Oliveira',
-      'age': '34 anos',
-      'city': 'Rio de Janeiro',
-      'contact': 'maria.oliveira@email.com',
-      'image': 'assets/images/person2.jpg', // Caminho da imagem
-    },
-    {
-      'name': 'João Silva',
-      'age': '28 anos',
-      'city': 'São Paulo',
-      'contact': 'joao.silva@email.com',
-      'image': 'assets/images/person1.jpg', // Caminho da imagem
-    },
+class SeeInterestedPage extends StatefulWidget {
+  final Map<String, dynamic> dataPet;
 
-    {
-      'name': 'Carlos Souza',
-      'age': '22 anos',
-      'city': 'Belo Horizonte',
-      'contact': 'carlos.souza@email.com',
-      'image': 'assets/images/person3.jpg', // Caminho da imagem
-    },
-    // Adicione mais interessados conforme necessário
-  ];
+  const SeeInterestedPage({super.key, required this.dataPet});
+
+  @override
+  State<SeeInterestedPage> createState() => _SeeInterestedPageState();
+}
+
+class _SeeInterestedPageState extends State<SeeInterestedPage> {
+  // Lista de interessados com suas informações
+  final List<Usuario> interestedPeople = [];
+  final FavoritoService favoritoService = FavoritoService();
+  // final List<Map<String, String>> interestedPeople = [
+  //   {
+  //     'name': 'Maria Oliveira',
+  //     'age': '34 anos',
+  //     'city': 'Rio de Janeiro',
+  //     'contact': 'maria.oliveira@email.com',
+  //     'image': 'assets/images/person2.jpg', // Caminho da imagem
+  //   },
+  //   {
+  //     'name': 'João Silva',
+  //     'age': '28 anos',
+  //     'city': 'São Paulo',
+  //     'contact': 'joao.silva@email.com',
+  //     'image': 'assets/images/person1.jpg', // Caminho da imagem
+  //   },
+
+  //   {
+  //     'name': 'Carlos Souza',
+  //     'age': '22 anos',
+  //     'city': 'Belo Horizonte',
+  //     'contact': 'carlos.souza@email.com',
+  //     'image': 'assets/images/person3.jpg', // Caminho da imagem
+  //   },
+  //   // Adicione mais interessados conforme necessário
+  // ];
+
+  @override
+  void initState() {
+    _getInterestedPeople();
+
+    super.initState();
+  }
+
+  _getInterestedPeople() async {
+    final list = await favoritoService.buscarFavoritosPorPet(
+        widget.dataPet['id'], context);
+    print(list);
+    // setState(() {
+    //   interestedPeople.addAll(list);
+    // });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,21 +84,22 @@ class SeeInterestedPage extends StatelessWidget {
                     borderRadius:
                         BorderRadius.circular(10.0), // Bordas arredondadas
                     image: DecorationImage(
-                      image: AssetImage(interestedPeople[index]['image']!),
+                      // image: AssetImage(interestedPeople[index]['image']!),
+                      image: AssetImage(interestedPeople[index].foto),
                       fit: BoxFit.cover, // Ajusta a imagem para cobrir o espaço
                     ),
                   ),
                 ),
                 title: Text(
-                  interestedPeople[index]['name']!,
+                  interestedPeople[index].nome,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(interestedPeople[index]['age']!),
-                    Text(interestedPeople[index]['city']!),
-                    Text(interestedPeople[index]['contact']!),
+                    Text(interestedPeople[index].dataNascimento),
+                    Text(interestedPeople[index].endereco),
+                    Text(interestedPeople[index].telefone),
                   ],
                 ),
                 trailing: GestureDetector(

@@ -26,8 +26,9 @@ class PetDetailsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        SeeInterestedPage(), // Sem precisar passar a lista de interessados
+                    builder: (context) => SeeInterestedPage(
+                      dataPet: data,
+                    ), // Sem precisar passar a lista de interessados
                   ),
                 );
               },
