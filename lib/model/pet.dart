@@ -59,25 +59,25 @@ class Pet {
     };
   }
 
-  factory Pet.fromMap(Map<String, dynamic> map, Map<String, dynamic> data) {
+  factory Pet.fromMap(Map<String, dynamic> map) {
     return Pet(
       id: map['id'],
       nome: map['nome'],
       foto: map['foto'],
-      idade: map['idade'],
-      especie: map['especie'],
-      raca: map['raca'],
-      porte: map['porte'],
-      sexo: map['sexo'],
-      temperamento: map['temperamento'],
-      estadoDeSaude: map['estado_de_saude'],
-      endereco: map['endereco'],
-      necessidades: map['necessidades'],
-      historia: map['historia'],
-      status: map['status'],
-      voluntarioUid: map['voluntario_uid'],
-      dataCriacao: DateTime.parse(map['data_criacao']),
-      dataAtualizacao: DateTime.parse(map['data_atualizacao']),
+      idade: map['idade'].toString(),
+      especie: map['especie'] ?? '',
+      raca: map['raca'] ?? '',
+      porte: map['porte'] ?? '',
+      sexo: map['sexo'] ?? '',
+      temperamento: map['temperamento'] ?? '',
+      estadoDeSaude: map['estado_de_saude'] ?? '',
+      endereco: map['endereco'] ?? '',
+      necessidades: map['necessidades'] ?? '',
+      historia: map['historia'] ?? '',
+      status: map['status'] ?? '',
+      voluntarioUid: map['voluntario_uid'] ?? '',
+      dataCriacao: DateTime.parse(map['data_criacao'] ?? ''),
+      dataAtualizacao: DateTime.parse(map['data_atualizacao'] ?? ''),
     );
   }
 }
