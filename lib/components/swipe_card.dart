@@ -122,7 +122,7 @@ class _SwipeCardState extends State<SwipeCard> {
               backCardOffset: Offset.zero,
               padding: const EdgeInsets.all(0.0),
               cardBuilder: (context, index, _, __) {
-                final pet = _pets[index];
+                var pet = _pets[index];
                 return Card(
                   margin: EdgeInsets.zero,
                   child: Stack(
@@ -206,6 +206,10 @@ class _SwipeCardState extends State<SwipeCard> {
                               return;
                             }
 
+                            pet = pet.copyWith(
+                              status: 'Aguardando Confirmação',
+                            );
+
                             favoritoService.criarFavorito(
                               Favorito(
                                 id: Uuid().v1(),
@@ -214,7 +218,8 @@ class _SwipeCardState extends State<SwipeCard> {
                               ),
                             );
 
-                            
+                            PetService().atualizarPet(pet, context);
+
                             controller.swipe(CardSwiperDirection.right);
                             // A chamada para _showFavoriteDialog foi removida
                           },

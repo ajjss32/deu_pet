@@ -51,7 +51,7 @@ class PetService {
       pet.dataAtualizacao = DateTime.now();
       await petsCollection.doc(pet.id).update(pet.toMap());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pet atualizado com sucesso!')),
+        SnackBar(content: Text('Pet foi adicionado aos seus favoritos')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -94,23 +94,23 @@ class PetService {
   }
 
   Future<List<Pet>> buscarTodosPets() async {
-  try {
-    // Consulta sem filtros para buscar todos os pets
-    QuerySnapshot querySnapshot = await petsCollection.get();
+    try {
+      // Consulta sem filtros para buscar todos os pets
+      QuerySnapshot querySnapshot = await petsCollection.get();
 
-    final results = querySnapshot.docs
-        .map((doc) => Pet.fromMap({
-              'id': doc.id,
-              ...doc.data() as Map<String, dynamic>,
-            }))
-        .toList();
+      final results = querySnapshot.docs
+          .map((doc) => Pet.fromMap({
+                'id': doc.id,
+                ...doc.data() as Map<String, dynamic>,
+              }))
+          .toList();
 
-    return results;
-  } catch (e) {
-    print('Erro ao buscar todos os pets: $e');
-    return [];
+      return results;
+    } catch (e) {
+      print('Erro ao buscar todos os pets: $e');
+      return [];
+    }
   }
-}
 
   // docs.map((doc) => Pet.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>}, doc.data() as Map<String, dynamic>)).toList();
   // Future<Usuario?> buscarUsuarioPorUid(String uid) async {
