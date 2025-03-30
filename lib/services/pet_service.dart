@@ -8,6 +8,7 @@ class PetService {
 
   Future<void> criarPet(Pet pet, BuildContext context) async {
     try {
+      // Verifique se o ID do pet já existe antes de cadastrar
       await petsCollection.doc(pet.id).set(pet.toMap());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Pet cadastrado com sucesso!')),
@@ -26,7 +27,8 @@ class PetService {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Pet encontrado com sucesso!')),
         );
-        return Pet.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        // Convertendo os dados do Firestore para o modelo Pet
+        return Pet.fromMap(doc.id as Map<String, dynamic>, doc.data() as Map<String, dynamic>);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Pet não encontrado!')),
@@ -42,6 +44,7 @@ class PetService {
 
   Future<void> atualizarPet(Pet pet, BuildContext context) async {
     try {
+      // Atualizando a data de atualização
       pet.dataAtualizacao = DateTime.now();
       await petsCollection.doc(pet.id).update(pet.toMap());
       ScaffoldMessenger.of(context).showSnackBar(

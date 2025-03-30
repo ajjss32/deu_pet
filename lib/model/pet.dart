@@ -2,7 +2,9 @@ class Pet {
   String id;
   String nome;
   String foto;
-  int idade;
+  String idade;
+  String especie;
+  String raca;
   String porte;
   String sexo;
   String temperamento;
@@ -20,6 +22,8 @@ class Pet {
     required this.nome,
     required this.foto,
     required this.idade,
+    required this.especie,
+    required this.raca,
     required this.porte,
     required this.sexo,
     required this.temperamento,
@@ -35,9 +39,12 @@ class Pet {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'nome': nome,
       'foto': foto,
       'idade': idade,
+      'especie': especie,
+      'raca': raca,
       'porte': porte,
       'sexo': sexo,
       'temperamento': temperamento,
@@ -52,12 +59,14 @@ class Pet {
     };
   }
 
-  factory Pet.fromMap(String id, Map<String, dynamic> map) {
+  factory Pet.fromMap(Map<String, dynamic> map, Map<String, dynamic> data) {
     return Pet(
-      id: id,
+      id: map['id'],
       nome: map['nome'],
       foto: map['foto'],
       idade: map['idade'],
+      especie: map['especie'],
+      raca: map['raca'],
       porte: map['porte'],
       sexo: map['sexo'],
       temperamento: map['temperamento'],
