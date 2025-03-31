@@ -3,6 +3,7 @@ import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/pet_service.dart';
 import 'package:flutter/material.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'pet_details_page.dart';
 
 class Mocks {
@@ -70,7 +71,8 @@ class Mocks {
 }
 
 class PetListScreen extends StatefulWidget {
-  PetListScreen({super.key});
+  final StreamChatClient client;
+  PetListScreen({super.key, required this.client});
 
   @override
   State<PetListScreen> createState() => _PetListScreenState();
@@ -175,7 +177,7 @@ class _PetListScreenState extends State<PetListScreen> {
     return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return PetDetailsPage(data: data);
+          return PetDetailsPage(data: data, client: widget.client);
         }));
       },
       child: Container(

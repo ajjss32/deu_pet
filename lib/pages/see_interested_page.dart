@@ -1,5 +1,7 @@
 import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/auth_service.dart';
+import 'package:deu_pet/services/chat_service.dart';
 import 'package:deu_pet/services/favorito_service.dart';
 import 'package:deu_pet/services/match_service.dart';
 import 'package:deu_pet/services/pet_service.dart';
@@ -11,8 +13,10 @@ import 'package:deu_pet/model/match.dart';
 
 class SeeInterestedPage extends StatefulWidget {
   final Map<String, dynamic> dataPet;
+  final StreamChatClient client;
 
-  const SeeInterestedPage({super.key, required this.dataPet});
+  const SeeInterestedPage(
+      {super.key, required this.dataPet, required this.client});
 
   @override
   State<SeeInterestedPage> createState() => _SeeInterestedPageState();
@@ -137,10 +141,22 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
 
                     PetService().atualizarPet(pet, context);
 
+                    final Usuario? user =
+                        await AuthService().getUsuarioLogado();
+
+                    Channel novoChat = await ChatService().createChannelOnMatch(
+                        interestedPeople[index].uid,
+                        user!.uid,
+                        interestedPeople[index].nome,
+                        widget.dataPet['nome'],
+                        widget.dataPet['foto'],
+                        widget.client);
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ChatScreen(), // Tela de chat
+                        builder: (context) =>
+                            MatchScreen(chat: novoChat),
                       ),
                     );
                   },

@@ -2,12 +2,15 @@ import 'package:deu_pet/model/pet.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/components/info_widget.dart';
 import 'package:deu_pet/components/custom_app_bar.dart';
-import 'see_interested_page.dart'; // Importe a página de interessados
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'see_interested_page.dart';
 
 class PetDetailsPage extends StatelessWidget {
   final Pet data;
+  final StreamChatClient client;
 
-  const PetDetailsPage({Key? key, required this.data}) : super(key: key);
+  const PetDetailsPage({Key? key, required this.data, required this.client})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,9 @@ class PetDetailsPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SeeInterestedPage(
-                      dataPet: data.toMap(),
-                    ), // Sem precisar passar a lista de interessados
+                        dataPet: data.toMap(),
+                        client:
+                            client),
                   ),
                 );
               },

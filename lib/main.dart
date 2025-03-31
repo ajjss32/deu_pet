@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         case 0:
           return PetRegistration();
         case 1:
-          return PetListScreen();
+          return PetListScreen(client: client);
         case 2:
           return ChannelListPage(client: client);
         case 3:
