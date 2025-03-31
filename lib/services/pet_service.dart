@@ -67,8 +67,6 @@ class PetService {
       );
     }
   }
-<<<<<<< HEAD
-=======
 
   Future<List<Pet>> buscarPetsPorUsuario(String usuarioId) async {
     try {
@@ -129,5 +127,4 @@ class PetService {
   //     return null;
   //   }
   // }
->>>>>>> ac3b03af52cf935fa8c006985b1e0be879901b45
 }

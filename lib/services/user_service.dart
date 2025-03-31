@@ -66,7 +66,7 @@ class UsuarioService {
   Future<void> atualizarUsuario(Usuario usuario) async {
     try {
       usuario.dataAtualizacao = DateTime.now();
-      await usuariosCollection.doc(usuario.id).update(usuario.toMap());
+      await usuariosCollection.doc(usuario.cpf_cnpj).update(usuario.toMap());
       print('Usuário atualizado com sucesso!');
     } catch (e) {
       print('Erro ao atualizar usuário: $e');

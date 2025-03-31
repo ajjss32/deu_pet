@@ -8,6 +8,10 @@ import 'package:deu_pet/pages/login_page.dart'; // Importe a tela de login
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
+  final StreamChatClient client;
+
+  ProfilePage({required this.client});
+
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -51,11 +55,14 @@ class _ProfilePageState extends State<ProfilePage> with RouteAware {
   }
 
   Future<void> _logout() async {
+    await ChatService()
+        .disconnectStreamChat(widget.client); // Desconecta do chat
     await _auth.signOut(); // Faz logout no Firebase
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => LoginPage(), // Navega para a tela de login
+        builder: (context) => LoginPage(client: widget.client),
       ),
     );
   }
@@ -131,8 +138,8 @@ class _ProfilePageState extends State<ProfilePage> with RouteAware {
                   _buildInfoRow("Telefone", _usuario!.telefone, Icons.phone),
                   _buildInfoRow("Data de Nascimento", _usuario!.dataNascimento,
                       Icons.calendar_today),
-                  _buildInfoRow(
-                      "CPF/CNPJ", _usuario!.id, Icons.assignment), // Novo campo
+                  _buildInfoRow("CPF/CNPJ", _usuario!.cpf_cnpj,
+                      Icons.assignment), // Novo campo
                   _buildDescricaoRow(
                       "Descrição", _usuario!.descricao, Icons.info),
                   _buildInfoRow("Endereço", _usuario!.endereco, Icons.place),
