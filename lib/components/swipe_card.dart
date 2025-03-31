@@ -24,75 +24,14 @@ class _SwipeCardState extends State<SwipeCard> {
   final PetService petService = PetService();
   List<Pet> _pets = [];
 
-  // final List<Map<String, String>> _pets = [
-  //   {
-  //     'name': 'Bob',
-  //     'age': '2 anos',
-  //     'description': 'Bob é um gato amigável e cheio de energia.',
-  //     'image': 'assets/images/pet1.png',
-  //     'id': '1',
-  //   },
-  //   {
-  //     'name': 'Thor',
-  //     'age': '3 anos',
-  //     'description': 'Thor adora aventuras ao ar livre e corridas.',
-  //     'image': 'assets/images/pet3.jpg',
-  //     'id': '2',
-  //   },
-  //   {
-  //     'name': 'Luna',
-  //     'age': '1 ano',
-  //     'description': 'Luna é uma cadelinha carinhosa e adora brincar.',
-  //     'image': 'assets/images/pet4.jpg',
-  //     'id': '3',
-  //   },
-  //   {
-  //     'name': 'Max',
-  //     'age': '4 anos',
-  //     'description': 'Max é um cachorro protetor e muito leal.',
-  //     'image': 'assets/images/pet5.jpg',
-  //     'id': '4',
-  //   },
-  //   {
-  //     'name': 'Mia',
-  //     'age': '3 anos',
-  //     'description': 'Mia é uma cadelinha elegante que adora relaxar.',
-  //     'image': 'assets/images/pet6.jpg',
-  //     'id': '5',
-  //   },
-  //   {
-  //     'name': 'Zeca',
-  //     'age': '5 anos',
-  //     'description': 'Zeca é um gato esperto que ama desafios.',
-  //     'image': 'assets/images/pet9.png',
-  //     'id': '6',
-  //   },
-  //   {
-  //     'name': 'Bella',
-  //     'age': '2 anos',
-  //     'description': 'Bella é uma cachorrinha dócil e muito sociável.',
-  //     'image': 'assets/images/pet10.jpeg',
-  //     'id': '7',
-  //   },
-  //   {
-  //     'name': 'Nina',
-  //     'age': '9 anos',
-  //     'description': 'Nina é uma gatinha curiosa e cheia de energia.',
-  //     'image': 'assets/images/pet12.jpeg',
-  //     'id': '8',
-  //   },
-  // ];
-
   @override
   void initState() {
     _getPets();
     super.initState();
   }
 
-  // Método para buscar os pets do banco de dados
   _getPets() async {
     final Usuario? user = await authService.getUsuarioLogado();
-    // mocks = await PetService().buscarPetsPorUsuario(user!.uid);
     final pets = await petService.buscarTodosPets();
     setState(() {
       _pets = pets;
@@ -115,7 +54,6 @@ class _SwipeCardState extends State<SwipeCard> {
               controller: controller,
               cardsCount: _pets.length,
               onSwipe: (previousIndex, currentIndex, direction) {
-                // A chamada para _showFavoriteDialog foi removida
                 return true;
               },
               numberOfCardsDisplayed: 1,
@@ -206,6 +144,19 @@ class _SwipeCardState extends State<SwipeCard> {
                               return;
                             }
 
+                            // Verificar se o pet já foi adicionado
+                            bool petJaFavorito = await favoritoService
+                                .checarPetFavorito(usuario.uid, pet.id);
+
+                            if (petJaFavorito) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Este pet já está nos favoritos!')),
+                              );
+                              return;
+                            }
+
                             favoritoService.criarFavorito(
                               Favorito(
                                 id: Uuid().v1(),
@@ -214,9 +165,7 @@ class _SwipeCardState extends State<SwipeCard> {
                               ),
                             );
 
-                            
                             controller.swipe(CardSwiperDirection.right);
-                            // A chamada para _showFavoriteDialog foi removida
                           },
                         ),
                       ),

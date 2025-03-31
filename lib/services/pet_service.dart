@@ -24,9 +24,6 @@ class PetService {
     try {
       DocumentSnapshot doc = await petsCollection.doc(id).get();
       if (doc.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Pet encontrado com sucesso!')),
-        );
         // Convertendo os dados do Firestore para o modelo Pet
         return Pet.fromMap({
           'id': doc.id,
@@ -94,23 +91,23 @@ class PetService {
   }
 
   Future<List<Pet>> buscarTodosPets() async {
-  try {
-    // Consulta sem filtros para buscar todos os pets
-    QuerySnapshot querySnapshot = await petsCollection.get();
+    try {
+      // Consulta sem filtros para buscar todos os pets
+      QuerySnapshot querySnapshot = await petsCollection.get();
 
-    final results = querySnapshot.docs
-        .map((doc) => Pet.fromMap({
-              'id': doc.id,
-              ...doc.data() as Map<String, dynamic>,
-            }))
-        .toList();
+      final results = querySnapshot.docs
+          .map((doc) => Pet.fromMap({
+                'id': doc.id,
+                ...doc.data() as Map<String, dynamic>,
+              }))
+          .toList();
 
-    return results;
-  } catch (e) {
-    print('Erro ao buscar todos os pets: $e');
-    return [];
+      return results;
+    } catch (e) {
+      print('Erro ao buscar todos os pets: $e');
+      return [];
+    }
   }
-}
 
   // docs.map((doc) => Pet.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>}, doc.data() as Map<String, dynamic>)).toList();
   // Future<Usuario?> buscarUsuarioPorUid(String uid) async {
