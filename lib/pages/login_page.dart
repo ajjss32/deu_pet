@@ -25,98 +25,114 @@ class _LoginPageState extends State<LoginPage> {
   final UsuarioService _userService = UsuarioService();
   final ChatService _chatService = ChatService();
 
-  get userType => null;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 80),
-            // Título e subtítulo no estilo da imagem
-            Text(
-              "Entrar",
-              style: TextStyle(
-                fontSize: 35,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF4E59D9), // Azul escuro
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Bem vindo de volta!",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 40),
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTextField(_emailController, "Email", Icons.email,
-                      keyboardType: TextInputType.emailAddress),
-                  _buildTextField(_passwordController, "Senha", Icons.lock,
-                      obscureText: true),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(300, 50),
-                      backgroundColor: Color(0xFF50BB88),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: _loginUser,
-                    child: Center(
-                      child: Text(
-                        "Entrar",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 80),
+                // Título e subtítulo no estilo da imagem
+                Text(
+                  "Entrar",
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF4E59D9), // Azul escuro
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Bem vindo de volta!",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTextField(_emailController, "Email", Icons.email,
+                          keyboardType: TextInputType.emailAddress),
+                      _buildTextField(_passwordController, "Senha", Icons.lock,
+                          obscureText: true),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(300, 50),
+                          backgroundColor: Color(0xFF50BB88),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: _loginUser,
+                        child: Center(
+                          child: Text(
+                                  "Entrar",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
-                    ),
-                  ),
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  RegistrationPage(client: widget.client)),
-                        );
-                      },
-                      child: Text(
-                        "Não tem uma conta? Cadastre-se",
-                        style: TextStyle(color: Colors.grey),
+                      Center(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      RegistrationPage(client: widget.client)),
+                            );
+                          },
+                          child: Text(
+                            "Não tem uma conta? Cadastre-se",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
+                SizedBox(height: 400),
+
+                // Logo no final da página
+                Padding(
+                  padding:
+                      EdgeInsets.only(bottom: 20), // Adiciona margem inferior
+                  child: Image.asset(
+                    'assets/logo.png',
+                    width: 50,
+                    height: 50,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black54.withOpacity(0.3),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
               ),
             ),
-            SizedBox(height: 400),
-
-            // Logo no final da página
-            Padding(
-              padding: EdgeInsets.only(bottom: 20), // Adiciona margem inferior
-              child: Image.asset(
-                'assets/logo.png',
-                width: 50,
-                height: 50,
-              ),
-            )
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -151,6 +167,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _loginUser() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
       try {
         // Fazendo login do usuário
         await _authService.userLogin(
@@ -193,6 +213,10 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro ao fazer login: $e")),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
