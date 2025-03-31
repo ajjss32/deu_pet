@@ -166,6 +166,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                 usuarioId: usuario.uid,
                                 petId: pet.id,
                               ),
+                              context
                             );
 
                             PetService().atualizarPet(pet, context);

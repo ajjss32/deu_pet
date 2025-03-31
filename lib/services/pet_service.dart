@@ -47,9 +47,7 @@ class PetService {
       // Atualizando a data de atualização
       pet.dataAtualizacao = DateTime.now();
       await petsCollection.doc(pet.id).update(pet.toMap());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pet foi adicionado aos seus favoritos')),
-      );
+      print('Pet atualizado com sucesso!');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao atualizar pet: $e')),

@@ -1,6 +1,8 @@
 import 'package:deu_pet/components/custom_app_bar.dart';
 import 'package:deu_pet/components/info_widget.dart';
+import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/services/favorito_service.dart';
+import 'package:deu_pet/services/pet_service.dart';
 import 'package:flutter/material.dart';
 
 class PetIndividualPage extends StatefulWidget {
@@ -36,6 +38,17 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
       return;
     }
     await favoritoService.deletarFavorito(widget.favoritoId!);
+
+    int favoritosRestantes = (await favoritoService.buscarFavoritosPorPet(
+            widget.data['id'], context))
+        .length;
+
+    if (favoritosRestantes == 0) {
+      Pet petAtualizado = Pet.fromMap(widget.data);
+      petAtualizado.status = 'Disponível';
+
+      await PetService().atualizarPet(petAtualizado, context);
+    }
 
     Navigator.pop(context, true);
   }

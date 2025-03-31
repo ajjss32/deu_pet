@@ -46,7 +46,7 @@ class FavoritoService {
     }
   }
 
-  Future<void> criarFavorito(Favorito favorite) async {
+  Future<void> criarFavorito(Favorito favorite, BuildContext context) async {
     try {
       // Verificar se o pet já está nos favoritos
       bool petJaFavorito =
@@ -58,7 +58,9 @@ class FavoritoService {
       }
 
       await favoritosCollection.doc(favorite.id).set(favorite.toMap());
-      print('Favorito criado com sucesso!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Favorito criado com sucesso!')),
+      );
     } catch (e) {
       print('Erro ao criar favorito: $e');
     }
