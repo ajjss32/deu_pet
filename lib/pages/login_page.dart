@@ -79,12 +79,12 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: _loginUser,
                         child: Center(
                           child: Text(
-                                  "Entrar",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                            "Entrar",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                       Center(
@@ -204,20 +204,67 @@ class _LoginPageState extends State<LoginPage> {
               ),
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Tipo de usuário não encontrado")),
-            );
+            _showError("Tipo de usuário não encontrado");
           }
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao fazer login: $e")),
-        );
+        String errorMessage = _getFirebaseErrorMessage(e);
+        _showError(errorMessage);
       } finally {
         setState(() {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            Colors.red,
+        duration: Duration(seconds: 4),
+      ),
+    );
+  }
+
+  String _getFirebaseErrorMessage(dynamic error) {
+    if (error is FirebaseAuthException) {
+      switch (error.code) {
+        case 'user-not-found':
+          return 'Usuário não encontrado. Verifique o email e tente novamente.';
+        case 'wrong-password':
+          return 'Senha incorreta. Tente novamente.';
+        case 'invalid-credential':
+          return 'As credenciais fornecidas são inválidas ou expiraram. Tente novamente.';
+        case 'email-already-exists':
+          return 'O e-mail fornecido já está em uso. Tente outro e-mail.';
+        case 'id-token-expired':
+          return 'O token de autenticação expirou. Faça login novamente.';
+        case 'id-token-revoked':
+          return 'O token de autenticação foi revogado. Faça login novamente.';
+        case 'insufficient-permission':
+          return 'Permissões insuficientes para realizar esta operação.';
+        case 'internal-error':
+          return 'Ocorreu um erro interno no servidor de autenticação. Tente novamente.';
+        case 'invalid-argument':
+          return 'Argumento inválido fornecido para autenticação. Verifique os dados.';
+        case 'invalid-email':
+          return 'O e-mail fornecido é inválido. Verifique e tente novamente.';
+        case 'invalid-password':
+          return 'A senha fornecida é inválida. Certifique-se de que tem pelo menos 6 caracteres.';
+        case 'operation-not-allowed':
+          return 'Este provedor de login está desativado. Tente outro método.';
+        case 'too-many-requests':
+          return 'Você fez muitas tentativas de login. Tente novamente mais tarde.';
+        case 'user-disabled':
+          return 'Sua conta foi desativada. Entre em contato com o suporte.';
+        default:
+          return 'Ocorreu um erro desconhecido. Tente novamente mais tarde.';
+      }
+    } else {
+      return 'Erro desconhecido. Tente novamente.';
     }
   }
 
