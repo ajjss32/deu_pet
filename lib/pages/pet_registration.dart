@@ -153,88 +153,89 @@ class _PetRegistrationState extends State<PetRegistration> {
     return null;
   }
 
-Map<String, int> _calculateAge(DateTime birthdate) {
-  final today = DateTime.now();
-  int years = today.year - birthdate.year;
-  int months = today.month - birthdate.month;
-  int days = today.day - birthdate.day;
+  Map<String, int> _calculateAge(DateTime birthdate) {
+    final today = DateTime.now();
+    int years = today.year - birthdate.year;
+    int months = today.month - birthdate.month;
+    int days = today.day - birthdate.day;
 
-  if (days < 0) {
-    months--;
-    days += DateTime(today.year, today.month, 0).day; // Ajusta os dias
+    if (days < 0) {
+      months--;
+      days += DateTime(today.year, today.month, 0).day; // Ajusta os dias
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12; // Ajusta os meses
+    }
+
+    return {'years': years, 'months': months, 'days': days};
   }
 
-  if (months < 0) {
-    years--;
-    months += 12; // Ajusta os meses
+  String _formatAge(int years, int months, int days) {
+    return '$years anos, $months meses, $days dias';
   }
-
-  return {'years': years, 'months': months, 'days': days};
-}
-
-String _formatAge(int years, int months, int days) {
-  return '$years anos, $months meses, $days dias';
-}
-
 
   void _registerPet() async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      final String? userUid = user?.uid;
+    if (_formKey.currentState!.validate()) {
+      try {
+        final User? user = FirebaseAuth.instance.currentUser;
+        final String? userUid = user?.uid;
 
-      if (userUid == null) {
-        throw Exception("Usuário não está logado.");
+        if (userUid == null) {
+          throw Exception("Usuário não está logado.");
+        }
+
+        String petId = Uuid().v4();
+
+        String? fotoBase64;
+        if (_image != null) {
+          fotoBase64 = base64Encode(_image!.readAsBytesSync());
+        }
+
+        final birthdateString = _birthdateController.text;
+        final birthdate = DateFormat('dd/MM/yyyy').parse(birthdateString);
+        final ageData = _calculateAge(birthdate);
+
+        final ageFormatted =
+            _formatAge(ageData['years']!, ageData['months']!, ageData['days']!);
+
+        Pet novoPet = Pet(
+          id: petId,
+          nome: _nameController.text,
+          foto: fotoBase64 ?? "",
+          idade: ageFormatted,
+          porte: _selectedSize ?? "",
+          sexo: _selectedSex ?? "",
+          temperamento: _selectedTemperament ?? "",
+          estadoDeSaude: _healthController.text,
+          endereco:
+              "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
+          necessidades: _specialNeeds ?? "",
+          historia: _historyController.text,
+          status: "Disponível",
+          especie: _selectedSpecies ?? "",
+          raca: _selectedBreed ?? "",
+          voluntarioUid: userUid,
+          dataCriacao: DateTime.now(),
+          dataAtualizacao: DateTime.now(),
+        );
+
+        await _petService.criarPet(novoPet, context);
+        _showSuccessDialog();
+        _clearFields();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao cadastrar pet: $e')),
+        );
       }
-
-      String petId = Uuid().v4();
-
-      String? fotoBase64;
-      if (_image != null) {
-        fotoBase64 = base64Encode(_image!.readAsBytesSync());
-      }
-
-      final birthdateString = _birthdateController.text;
-      final birthdate = DateFormat('dd/MM/yyyy').parse(birthdateString);
-      final ageData = _calculateAge(birthdate);
-      
-      final ageFormatted = _formatAge(ageData['years']!, ageData['months']!, ageData['days']!);
-
-      Pet novoPet = Pet(
-        id: petId,
-        nome: _nameController.text,
-        foto: fotoBase64 ?? "",
-        idade: ageFormatted, 
-        porte: _selectedSize ?? "",
-        sexo: _selectedSex ?? "",
-        temperamento: _selectedTemperament ?? "",
-        estadoDeSaude: _healthController.text,
-        endereco:
-            "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
-        necessidades: _specialNeeds ?? "",
-        historia: _historyController.text,
-        status: "Disponível",
-        especie: _selectedSpecies ?? "",
-        raca: _selectedBreed ?? "",
-        voluntarioUid: userUid,
-        dataCriacao: DateTime.now(),
-        dataAtualizacao: DateTime.now(),
-      );
-
-      await _petService.criarPet(novoPet, context);
-      _showSuccessDialog();
-      _clearFields();
-    } catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao cadastrar pet: $e')),
+        SnackBar(
+            content: Text('Por favor, preencha todos os campos corretamente.')),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Por favor, preencha todos os campos corretamente.')),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -305,7 +306,8 @@ String _formatAge(int years, int months, int days) {
                   border: OutlineInputBorder(),
                 ),
                 items: _selectedSpecies == 'Canino'
-                    ? ['Sem raça definida',
+                    ? [
+                        'Sem raça definida',
                         'Labrador',
                         'Bulldog',
                         'Pinscher',
@@ -331,20 +333,23 @@ String _formatAge(int years, int months, int days) {
                         'Dálmata',
                         'Basset Hound',
                         'Shiba Inu',
-                        'Outra',] 
+                        'Outra',
+                      ]
                         .map((breed) => DropdownMenuItem(
                               value: breed,
                               child: Text(breed),
                             ))
                         .toList()
-                    : ['Sem raça definida',
-                      'Siamês',
-                      'Persa',
-                      'Maine Coon',
-                      'Ragdoll',
-                      'Bengal',
-                      'Sphynx',
-                      'Outra',] 
+                    : [
+                        'Sem raça definida',
+                        'Siamês',
+                        'Persa',
+                        'Maine Coon',
+                        'Ragdoll',
+                        'Bengal',
+                        'Sphynx',
+                        'Outra',
+                      ]
                         .map((breed) => DropdownMenuItem(
                               value: breed,
                               child: Text(breed),
@@ -487,6 +492,10 @@ String _formatAge(int years, int months, int days) {
                     child: ElevatedButton(
                       onPressed: _buscarCEP,
                       child: Text("Buscar CEP"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF50BB88),
+                        foregroundColor: (Colors.white),
+                      ),
                     ),
                   ),
                 ],

@@ -127,6 +127,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       child: Text("Buscar"),
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 15),
+                        backgroundColor: Color(0xFF50BB88),
+                        foregroundColor: (Colors.white),
                       ),
                     ),
                   ),
