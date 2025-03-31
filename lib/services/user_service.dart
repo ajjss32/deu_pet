@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/cep_service.dart';
 
 class UsuarioService {
   final CollectionReference usuariosCollection =
@@ -11,16 +12,6 @@ class UsuarioService {
       print('Usuário criado com sucesso!');
     } catch (e) {
       print('Erro ao criar usuário: $e');
-    }
-  }
-
-  Future<void> atualizarUsuario(Usuario usuario) async {
-    try {
-      usuario.dataAtualizacao = DateTime.now();
-      await usuariosCollection.doc(usuario.id).update(usuario.toMap());
-      print('Usuário atualizado com sucesso!');
-    } catch (e) {
-      print('Erro ao atualizar usuário: $e');
     }
   }
 
@@ -68,6 +59,28 @@ class UsuarioService {
     } catch (e) {
       print('Erro ao obter tipo de usuário: $e');
       return null;
+    }
+  }
+
+  // Atualiza os dados do usuário no Firestore
+  Future<void> atualizarUsuario(Usuario usuario) async {
+    try {
+      usuario.dataAtualizacao = DateTime.now();
+      await usuariosCollection.doc(usuario.id).update(usuario.toMap());
+      print('Usuário atualizado com sucesso!');
+    } catch (e) {
+      print('Erro ao atualizar usuário: $e');
+      throw Exception("Erro ao atualizar o usuário: $e");
+    }
+  }
+
+  // Busca o endereço pelo CEP
+  Future<Map<String, dynamic>> buscarEnderecoPorCEP(String cep) async {
+    try {
+      return await CEPService.buscarCEP(cep);
+    } catch (e) {
+      print('Erro ao buscar CEP: $e');
+      throw Exception("Erro ao buscar CEP: $e");
     }
   }
 }

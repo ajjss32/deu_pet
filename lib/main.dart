@@ -14,8 +14,10 @@ import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
 import 'firebase_options.dart';
 import 'package:deu_pet/model/user.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() async {
+  setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

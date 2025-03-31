@@ -21,6 +21,8 @@ dependencies:
   firebase_auth: ^5.5.0
   uuid: ^4.4.2
   http: ^1.1.0
+  firebase_storage: 12.4.4
+
 
 dev_dependencies:
   flutter_test:
@@ -56,3 +58,4 @@ flutter:
     - assets/images/person3.jpg
     - assets/images/deu_pet.png
     - assets/images/Background.png
+    - assets/images/default_profile.png

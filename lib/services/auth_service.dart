@@ -42,4 +42,14 @@ class AuthService {
     if (user == null) return null;
     return UsuarioService().buscarUsuarioPorUid(user.uid);
   }
+
+  // Método para atualizar a senha do usuário
+  Future<void> updatePassword(String newPassword) async {
+    final user = _firebaseAuth.currentUser;
+    if (user != null) {
+      await user.updatePassword(newPassword);
+    } else {
+      throw Exception("Usuário não está logado.");
+    }
+  }
 }
