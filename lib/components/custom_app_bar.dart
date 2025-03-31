@@ -11,20 +11,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         'assets/logo.png', // Caminho do logo no projeto
         height: 40.0,
       ),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.notifications), // Ícone de pesquisa
-          onPressed: () {
-            print('Pesquisa acionada');
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.filter_list), // Ícone de filtro
-          onPressed: () {
-            print('Filtro aplicado');
-          },
-        ),
-      ],
     );
   }
 }
