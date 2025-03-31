@@ -1,3 +1,7 @@
+import 'package:deu_pet/model/pet.dart';
+import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/auth_service.dart';
+import 'package:deu_pet/services/pet_service.dart';
 import 'package:flutter/material.dart';
 import 'pet_details_page.dart';
 
@@ -65,10 +69,32 @@ class Mocks {
   ];
 }
 
-class PetListScreen extends StatelessWidget {
-  final Mocks mocks = Mocks();
-
+class PetListScreen extends StatefulWidget {
   PetListScreen({super.key});
+
+  @override
+  State<PetListScreen> createState() => _PetListScreenState();
+}
+
+class _PetListScreenState extends State<PetListScreen> {
+  // final Mocks mocks = Mocks();
+  final List<Pet> mocks = [];
+  final PetService petService = PetService();
+
+  @override
+  void initState() {
+    _getPets();
+    super.initState();
+  }
+
+  _getPets() async {
+    final Usuario? user = await AuthService().getUsuarioLogado();
+    // mocks = await PetService().buscarPetsPorUsuario(user!.uid);
+    final pets = await petService.buscarPetsPorUsuario(user!.uid);
+
+    mocks.addAll(pets);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +104,29 @@ class PetListScreen extends StatelessWidget {
   }
 
   Widget _buildBody() {
+    if (mocks.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.pets,
+              size: 100,
+              color: Colors.grey[300],
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Nenhum animal cadastrado',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.grey[300],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -96,7 +145,8 @@ class PetListScreen extends StatelessWidget {
           ),
           Expanded(
             child: GridView.builder(
-              itemCount: mocks.petsMocks.length,
+              // itemCount: mocks.petsMocks.length,
+              itemCount: mocks.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 0.7,
@@ -106,7 +156,7 @@ class PetListScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 return buildCard(
                   context: context,
-                  data: mocks.petsMocks[index],
+                  data: mocks[index],
                 );
               },
             ),
@@ -118,9 +168,9 @@ class PetListScreen extends StatelessWidget {
 
   Widget buildCard({
     required BuildContext context,
-    required Map<String, dynamic> data,
+    required Pet data,
   }) {
-    String status = data['status'] ?? 'Disponível'; // Defina o status padrão
+    String status = data.status ?? 'Disponível'; // Defina o status padrão
 
     return InkWell(
       onTap: () {
@@ -139,7 +189,8 @@ class PetListScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
-                  data['image'][0],
+                  //TODO: imagem place holder, subtituir
+                  data.foto,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -168,7 +219,7 @@ class PetListScreen extends StatelessWidget {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Text(
-                  '${data['name']}, ${data['age']}',
+                  '${data.nome}, ${data.idade}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -187,6 +238,8 @@ class PetListScreen extends StatelessWidget {
     switch (status) {
       case 'Aguardando confirmação':
         return Colors.orange;
+      case 'Aguardando adoção':
+        return Colors.green;  
       case 'Adotado':
         return Colors.green;
       case 'Disponível':

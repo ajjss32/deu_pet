@@ -59,25 +59,65 @@ class Pet {
     };
   }
 
-  factory Pet.fromMap(Map<String, dynamic> map, Map<String, dynamic> data) {
+  factory Pet.fromMap(Map<String, dynamic> map) {
     return Pet(
       id: map['id'],
       nome: map['nome'],
       foto: map['foto'],
-      idade: map['idade'],
-      especie: map['especie'],
-      raca: map['raca'],
-      porte: map['porte'],
-      sexo: map['sexo'],
-      temperamento: map['temperamento'],
-      estadoDeSaude: map['estado_de_saude'],
-      endereco: map['endereco'],
-      necessidades: map['necessidades'],
-      historia: map['historia'],
-      status: map['status'],
-      voluntarioUid: map['voluntario_uid'],
-      dataCriacao: DateTime.parse(map['data_criacao']),
-      dataAtualizacao: DateTime.parse(map['data_atualizacao']),
+      idade: map['idade'].toString(),
+      especie: map['especie'] ?? '',
+      raca: map['raca'] ?? '',
+      porte: map['porte'] ?? '',
+      sexo: map['sexo'] ?? '',
+      temperamento: map['temperamento'] ?? '',
+      estadoDeSaude: map['estado_de_saude'] ?? '',
+      endereco: map['endereco'] ?? '',
+      necessidades: map['necessidades'] ?? '',
+      historia: map['historia'] ?? '',
+      status: map['status'] ?? '',
+      voluntarioUid: map['voluntario_uid'] ?? '',
+      dataCriacao: DateTime.parse(map['data_criacao'] ?? ''),
+      dataAtualizacao: DateTime.parse(map['data_atualizacao'] ?? ''),
+    );
+  }
+
+  Pet copyWith({
+    String? id,
+    String? nome,
+    String? foto,
+    String? idade,
+    String? especie,
+    String? raca,
+    String? porte,
+    String? sexo,
+    String? temperamento,
+    String? estadoDeSaude,
+    String? endereco,
+    String? necessidades,
+    String? historia,
+    String? status,
+    String? voluntarioUid,
+    DateTime? dataCriacao,
+    DateTime? dataAtualizacao,
+  }) {
+    return Pet(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      foto: foto ?? this.foto,
+      idade: idade ?? this.idade,
+      especie: especie ?? this.especie,
+      raca: raca ?? this.raca,
+      porte: porte ?? this.porte,
+      sexo: sexo ?? this.sexo,
+      temperamento: temperamento ?? this.temperamento,
+      estadoDeSaude: estadoDeSaude ?? this.estadoDeSaude,
+      endereco: endereco ?? this.endereco,
+      necessidades: necessidades ?? this.necessidades,
+      historia: historia ?? this.historia,
+      status: status ?? this.status,
+      voluntarioUid: voluntarioUid ?? this.voluntarioUid,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
     );
   }
 }

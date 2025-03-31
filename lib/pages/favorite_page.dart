@@ -1,20 +1,39 @@
-import 'package:deu_pet/mocks/mocks.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:deu_pet/model/favorito.dart';
+import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/pages/pet_individual_page.dart';
+import 'package:deu_pet/services/favorito_service.dart';
+import 'package:deu_pet/services/pet_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class FavoritePage extends StatelessWidget {
-  final Mocks mocks = Mocks();
-
+class FavoritePage extends StatefulWidget {
   FavoritePage({super.key});
 
   @override
+  _FavoritePageState createState() => _FavoritePageState();
+}
+
+class _FavoritePageState extends State<FavoritePage> {
+  final FavoritoService favoritoService = FavoritoService();
+  final PetService petService = PetService();
+
+  @override
   Widget build(BuildContext context) {
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      return Scaffold(
+        body: Center(child: Text('Usuário não autenticado')),
+      );
+    }
+
     return Scaffold(
-      body: _buildBody(),
+      body: _buildBody(userId, context),
     );
   }
 
-  _buildBody() {
+  Widget _buildBody(String userId, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -32,18 +51,55 @@ class FavoritePage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              itemCount: mocks.petsMocks.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemBuilder: (context, index) {
-                return buildCard(
-                  context: context,
-                  data: mocks.petsMocks[index],
+            child: FutureBuilder<List<Favorito>>(
+              future:
+                  favoritoService.buscarFavoritosPorUsuario(userId, context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Erro ao carregar favoritos'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Nenhum favorito encontrado'));
+                }
+
+                final favoritos = snapshot.data!;
+
+                return FutureBuilder<List<Pet>>(
+                  future: Future.wait(
+                    favoritos.map((favorito) =>
+                        petService.buscarPet(favorito.petId, context)),
+                  ).then((pets) => pets.whereType<Pet>().toList()),
+                  builder: (context, petSnapshot) {
+                    if (petSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (petSnapshot.hasError) {
+                      return Center(child: Text('Erro ao carregar pets'));
+                    } else if (!petSnapshot.hasData ||
+                        petSnapshot.data!.isEmpty) {
+                      return Center(child: Text('Nenhum pet encontrado'));
+                    }
+
+                    final pets = petSnapshot.data!;
+
+                    return GridView.builder(
+                      itemCount: pets.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.7,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                      ),
+                      itemBuilder: (context, index) {
+                        return buildCard(
+                          context: context,
+                          pet: pets[index],
+                          favoritoId: favoritos[index].id, // Passando ID
+                        );
+                      },
+                    );
+                  },
                 );
               },
             ),
@@ -55,48 +111,59 @@ class FavoritePage extends StatelessWidget {
 
   Widget buildCard({
     required BuildContext context,
-    required Map<String, dynamic> data,
+    required Pet pet,
+    required String favoritoId,
   }) {
     return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return PetIndividualPage(
-            data: data,
-            // name: name,
-            // age: age,
-            // imagePath: imagePath,
-          );
-        }));
-      },
-      child: Container(
-        child: Stack(children: [
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                data['image'][0],
-                fit: BoxFit.cover,
-              ),
+      onTap: () async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PetIndividualPage(
+              data: pet.toMap(),
+              favoritoId: favoritoId,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                removeAno('${data['name']}, ${data['age']}'),
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+        );
+
+        if (result == true) {
+          setState(() {}); // Atualiza a página ao remover favorito
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.red,
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  pet.foto.isNotEmpty
+                      ? pet.foto
+                      : 'https://via.placeholder.com/150',
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-          ),
-        ]),
-        decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(20),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8),
+              child: Align(
+                alignment: Alignment.bottomLeft,
+                child: Text(
+                  removeAno('${pet.nome}, ${pet.idade}'),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

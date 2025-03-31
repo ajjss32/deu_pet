@@ -24,11 +24,11 @@ class PetService {
     try {
       DocumentSnapshot doc = await petsCollection.doc(id).get();
       if (doc.exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Pet encontrado com sucesso!')),
-        );
         // Convertendo os dados do Firestore para o modelo Pet
-        return Pet.fromMap(doc.id as Map<String, dynamic>, doc.data() as Map<String, dynamic>);
+        return Pet.fromMap({
+          'id': doc.id,
+          ...doc.data() as Map<String, dynamic>,
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Pet não encontrado!')),
@@ -48,7 +48,7 @@ class PetService {
       pet.dataAtualizacao = DateTime.now();
       await petsCollection.doc(pet.id).update(pet.toMap());
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pet atualizado com sucesso!')),
+        SnackBar(content: Text('Pet foi adicionado aos seus favoritos')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,4 +69,64 @@ class PetService {
       );
     }
   }
+
+  Future<List<Pet>> buscarPetsPorUsuario(String usuarioId) async {
+    try {
+      QuerySnapshot querySnapshot = await petsCollection
+          .where('voluntario_uid', isEqualTo: usuarioId)
+          .get();
+
+      final results = querySnapshot.docs
+          .map((doc) => Pet.fromMap({
+                'id': doc.id,
+                ...doc.data() as Map<String, dynamic>,
+              }))
+          .toList();
+
+      return results;
+    } catch (e) {
+      print('Erro ao buscar pets: $e');
+      return [];
+    }
+  }
+
+  Future<List<Pet>> buscarTodosPets() async {
+    try {
+      // Consulta sem filtros para buscar todos os pets
+      QuerySnapshot querySnapshot = await petsCollection.get();
+
+      final results = querySnapshot.docs
+          .map((doc) => Pet.fromMap({
+                'id': doc.id,
+                ...doc.data() as Map<String, dynamic>,
+              }))
+          .toList();
+
+      return results;
+    } catch (e) {
+      print('Erro ao buscar todos os pets: $e');
+      return [];
+    }
+  }
+
+  // docs.map((doc) => Pet.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>}, doc.data() as Map<String, dynamic>)).toList();
+  // Future<Usuario?> buscarUsuarioPorUid(String uid) async {
+  //   try {
+  //     QuerySnapshot querySnapshot =
+  //         await usuariosCollection.where('uid', isEqualTo: uid).get();
+
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       var doc = querySnapshot.docs.first;
+  //       Usuario usuario =
+  //           Usuario.fromMap(uid, doc.data() as Map<String, dynamic>);
+  //       return usuario;
+  //     } else {
+  //       print('Usuário não encontrado');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('Erro ao buscar usuário: $e');
+  //     return null;
+  //   }
+  // }
 }

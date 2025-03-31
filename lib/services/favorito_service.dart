@@ -48,11 +48,34 @@ class FavoritoService {
 
   Future<void> criarFavorito(Favorito favorite) async {
     try {
+      // Verificar se o pet já está nos favoritos
+      bool petJaFavorito =
+          await checarPetFavorito(favorite.usuarioId, favorite.petId);
+
+      if (petJaFavorito) {
+        print('Este pet já foi adicionado aos favoritos.');
+        return;
+      }
+
       await favoritosCollection.doc(favorite.id).set(favorite.toMap());
-      
-      print('favorito criado com sucesso!');
+      print('Favorito criado com sucesso!');
     } catch (e) {
       print('Erro ao criar favorito: $e');
+    }
+  }
+
+  // Função para verificar se o pet já está nos favoritos
+  Future<bool> checarPetFavorito(String usuarioId, String petId) async {
+    try {
+      QuerySnapshot querySnapshot = await favoritosCollection
+          .where('usuario_id', isEqualTo: usuarioId)
+          .where('pet_id', isEqualTo: petId)
+          .get();
+
+      return querySnapshot.docs.isNotEmpty; // Retorna true se já existir
+    } catch (e) {
+      print('Erro ao verificar pet favorito: $e');
+      return false;
     }
   }
 }

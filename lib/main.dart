@@ -45,7 +45,6 @@ class MyApp extends StatelessWidget {
           client: client,
           streamChatThemeData: StreamChatThemeData.light(),
           child: child!,
-          
         );
       },
       home: LoginPage(client: client),
@@ -60,7 +59,8 @@ class HomeScreen extends StatefulWidget {
   HomeScreen({required this.userType, required this.client});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState(userType: userType, client: client);
+  _HomeScreenState createState() =>
+      _HomeScreenState(userType: userType, client: client);
 }
 
 class _HomeScreenState extends State<HomeScreen> {
