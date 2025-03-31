@@ -1,12 +1,16 @@
+import 'package:deu_pet/model/pet.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/components/info_widget.dart';
 import 'package:deu_pet/components/custom_app_bar.dart';
-import 'see_interested_page.dart'; // Importe a página de interessados
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'see_interested_page.dart';
 
 class PetDetailsPage extends StatelessWidget {
-  final Map<String, dynamic> data;
+  final Pet data;
+  final StreamChatClient client;
 
-  const PetDetailsPage({Key? key, required this.data}) : super(key: key);
+  const PetDetailsPage({Key? key, required this.data, required this.client})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +30,10 @@ class PetDetailsPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        SeeInterestedPage(), // Sem precisar passar a lista de interessados
+                    builder: (context) => SeeInterestedPage(
+                        dataPet: data.toMap(),
+                        client:
+                            client),
                   ),
                 );
               },
@@ -50,7 +56,9 @@ class PetDetailsPage extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0), // Menor padding geral
             child: ListView.builder(
-              itemCount: data['image'].length,
+              // itemCount: data['image'].length,
+              //TODO: nao existe uma lista de imagens no objeto pet
+              itemCount: 0,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 return Container(
@@ -65,7 +73,8 @@ class PetDetailsPage extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.asset(
-                      data['image'][index],
+                      // data['image'][index],
+                      data.foto,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -80,7 +89,7 @@ class PetDetailsPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                data['name'],
+                data.nome,
                 style: TextStyle(fontSize: 28),
               ),
               SizedBox(width: 4),
@@ -100,33 +109,29 @@ class PetDetailsPage extends StatelessWidget {
               mainAxisSpacing: 8,
               childAspectRatio: 2.5,
               children: [
-                InfoWidget(title: 'Nome', value: data['name'], fontSize: 14),
+                InfoWidget(title: 'Nome', value: data.nome, fontSize: 14),
                 InfoWidget(
-                    title: 'Espécie/Raça',
-                    value: data['species'],
-                    fontSize: 14),
+                    title: 'Espécie/Raça', value: data.especie + '/' + data.raca, fontSize: 14),
                 InfoWidget(
-                    title: 'Idade', value: '${data['age']} anos', fontSize: 14),
-                InfoWidget(title: 'Sexo', value: data['sex'], fontSize: 14),
-                InfoWidget(title: 'Porte', value: data['size'], fontSize: 14),
+                    title: 'Idade', value: '${data.idade} anos', fontSize: 14),
+                InfoWidget(title: 'Sexo', value: data.sexo, fontSize: 14),
+                InfoWidget(title: 'Porte', value: data.porte, fontSize: 14),
                 InfoWidget(
                     title: 'Temperamento',
-                    value: data['temperament'],
+                    value: data.temperamento,
                     fontSize: 14),
                 InfoWidget(
                     title: 'Estado de saúde',
-                    value: data['health'],
+                    value: data.estadoDeSaude,
                     fontSize: 14),
                 InfoWidget(
-                    title: 'Localização',
-                    value: data['location'],
-                    fontSize: 14),
+                    title: 'Localização', value: data.endereco, fontSize: 14),
                 InfoWidget(
                     title: 'Necessidades especiais',
-                    value: data['specialNeeds'],
+                    value: data.necessidades,
                     fontSize: 14),
                 InfoWidget(
-                    title: 'História', value: data['history'], fontSize: 14),
+                    title: 'História', value: data.historia, fontSize: 14),
               ],
             ),
           ),

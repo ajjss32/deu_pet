@@ -31,8 +31,7 @@ class AuthService {
       );
       return userCredential;
     } catch (e) {
-      print("Erro no login: $e");
-      return null;
+      throw e;
     }
   }
 

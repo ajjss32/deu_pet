@@ -1,11 +1,17 @@
+import 'package:deu_pet/services/chat_service.dart';
 import 'package:flutter/material.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-class ChatScreen extends StatefulWidget {
+class MatchScreen extends StatefulWidget {
+  final Channel chat;
+
+  MatchScreen({required this.chat});
+
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _MatchScreenState createState() => _MatchScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen>
+class _MatchScreenState extends State<MatchScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -221,6 +227,8 @@ class _ChatScreenState extends State<ChatScreen>
                           ),
                         );
                       } else {
+                        ChatService().sendMessageOnMatch(
+                            widget.chat, _messageController.text);
                         _messageController.clear();
                         _showSuccessDialog();
                       }

@@ -1,5 +1,12 @@
+import 'package:deu_pet/model/favorito.dart';
+import 'package:deu_pet/model/pet.dart';
+import 'package:deu_pet/model/user.dart';
+import 'package:deu_pet/services/auth_service.dart';
+import 'package:deu_pet/services/favorito_service.dart';
+import 'package:deu_pet/services/pet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class SwipeCard extends StatefulWidget {
   final VoidCallback showFavorites; // Função passada pela HomeScreen
@@ -12,57 +19,24 @@ class SwipeCard extends StatefulWidget {
 
 class _SwipeCardState extends State<SwipeCard> {
   final CardSwiperController controller = CardSwiperController();
+  final FavoritoService favoritoService = FavoritoService();
+  final AuthService authService = AuthService();
+  final PetService petService = PetService();
+  List<Pet> _pets = [];
 
-  final List<Map<String, String>> _pets = [
-    {
-      'name': 'Bob',
-      'age': '2 anos',
-      'description': 'Bob é um gato amigável e cheio de energia.',
-      'image': 'assets/images/pet1.png'
-    },
-    {
-      'name': 'Thor',
-      'age': '3 anos',
-      'description': 'Thor adora aventuras ao ar livre e corridas.',
-      'image': 'assets/images/pet3.jpg'
-    },
-    {
-      'name': 'Luna',
-      'age': '1 ano',
-      'description': 'Luna é uma cadelinha carinhosa e adora brincar.',
-      'image': 'assets/images/pet4.jpg'
-    },
-    {
-      'name': 'Max',
-      'age': '4 anos',
-      'description': 'Max é um cachorro protetor e muito leal.',
-      'image': 'assets/images/pet5.jpg'
-    },
-    {
-      'name': 'Mia',
-      'age': '3 anos',
-      'description': 'Mia é uma cadelinha elegante que adora relaxar.',
-      'image': 'assets/images/pet6.jpg'
-    },
-    {
-      'name': 'Zeca',
-      'age': '5 anos',
-      'description': 'Zeca é um gato esperto que ama desafios.',
-      'image': 'assets/images/pet9.png'
-    },
-    {
-      'name': 'Bella',
-      'age': '2 anos',
-      'description': 'Bella é uma cachorrinha dócil e muito sociável.',
-      'image': 'assets/images/pet10.jpeg'
-    },
-    {
-      'name': 'Nina',
-      'age': '9 anos',
-      'description': 'Nina é uma gatinha curiosa e cheia de energia.',
-      'image': 'assets/images/pet12.jpeg'
-    },
-  ];
+  @override
+  void initState() {
+    _getPets();
+    super.initState();
+  }
+
+  _getPets() async {
+    final Usuario? user = await authService.getUsuarioLogado();
+    final pets = await petService.buscarTodosPets();
+    setState(() {
+      _pets = pets;
+    });
+  }
 
   @override
   void dispose() {
@@ -80,21 +54,20 @@ class _SwipeCardState extends State<SwipeCard> {
               controller: controller,
               cardsCount: _pets.length,
               onSwipe: (previousIndex, currentIndex, direction) {
-                // A chamada para _showFavoriteDialog foi removida
                 return true;
               },
               numberOfCardsDisplayed: 1,
               backCardOffset: Offset.zero,
               padding: const EdgeInsets.all(0.0),
               cardBuilder: (context, index, _, __) {
-                final pet = _pets[index];
+                var pet = _pets[index];
                 return Card(
                   margin: EdgeInsets.zero,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
                       Image.asset(
-                        pet['image']!,
+                        pet.foto,
                         fit: BoxFit.cover,
                       ),
                       Container(
@@ -119,7 +92,7 @@ class _SwipeCardState extends State<SwipeCard> {
                             Row(
                               children: [
                                 Text(
-                                  pet['name']!,
+                                  pet.nome,
                                   style: TextStyle(
                                     fontSize: 42,
                                     fontWeight: FontWeight.bold,
@@ -128,7 +101,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  pet['age']!,
+                                  pet.idade,
                                   style: TextStyle(
                                     fontSize: 20,
                                     color: Colors.white,
@@ -138,7 +111,7 @@ class _SwipeCardState extends State<SwipeCard> {
                             ),
                             SizedBox(height: 5),
                             Text(
-                              pet['description']!,
+                              pet.historia,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white,
@@ -163,9 +136,42 @@ class _SwipeCardState extends State<SwipeCard> {
                         child: _buildIconButton(
                           icon: Icons.favorite,
                           color: Color(0xFF20ECB9),
-                          onPressed: () {
+                          onPressed: () async {
+                            final Usuario? usuario =
+                                await authService.getUsuarioLogado();
+
+                            if (usuario == null) {
+                              return;
+                            }
+
+                            // Verificar se o pet já foi adicionado
+                            bool petJaFavorito = await favoritoService
+                                .checarPetFavorito(usuario.uid, pet.id);
+
+                            if (petJaFavorito) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Este pet já está nos favoritos!')),
+                              );
+                              return;
+                            }
+                            pet = pet.copyWith(
+                              status: 'Aguardando Confirmação',
+                            );
+
+                            favoritoService.criarFavorito(
+                              Favorito(
+                                id: Uuid().v1(),
+                                usuarioId: usuario.uid,
+                                petId: pet.id,
+                              ),
+                              context
+                            );
+
+                            PetService().atualizarPet(pet, context);
+
                             controller.swipe(CardSwiperDirection.right);
-                            // A chamada para _showFavoriteDialog foi removida
                           },
                         ),
                       ),

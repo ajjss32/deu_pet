@@ -1,9 +1,11 @@
+import 'package:deu_pet/services/chat_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/edit_profile_page.dart'; // Importe a tela de edição
 import 'package:deu_pet/pages/login_page.dart'; // Importe a tela de login
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   @override

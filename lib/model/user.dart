@@ -1,6 +1,6 @@
 class Usuario {
   String uid;
-  String id;
+  String cpf_cnpj;
   String email;
   String foto;
   String tipo;
@@ -14,7 +14,7 @@ class Usuario {
 
   Usuario({
     required this.uid,
-    required this.id,
+    required this.cpf_cnpj,
     required this.email,
     required this.foto,
     required this.tipo,
@@ -30,6 +30,7 @@ class Usuario {
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
+      'cpf_cnpj': cpf_cnpj,
       'email': email,
       'foto': foto,
       'tipo': tipo,
@@ -43,10 +44,10 @@ class Usuario {
     };
   }
 
-  factory Usuario.fromMap(String uid, String id, Map<String, dynamic> map) {
+  factory Usuario.fromMap(String uid, Map<String, dynamic> map) {
     return Usuario(
       uid: uid,
-      id: id,
+      cpf_cnpj: map['cpf_cnpj'],
       email: map['email'],
       foto: map['foto'],
       tipo: map['tipo'],

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -6,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:deu_pet/services/pet_service.dart';
 import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
+import 'package:intl/intl.dart'; // Para manipulação de data
 
 class PetRegistration extends StatefulWidget {
   @override
@@ -22,10 +24,11 @@ class _PetRegistrationState extends State<PetRegistration> {
   final TextEditingController _bairroController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
-  final TextEditingController _specialNeedsController = TextEditingController();
+  String? _specialNeeds; // Alterei para armazenar a escolha "Sim" ou "Não"
   final TextEditingController _historyController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _speciesController = TextEditingController();
+  final TextEditingController _birthdateController = TextEditingController();
+  String? _selectedSpecies; // Alterado para o nome da espécie
+  String? _selectedBreed; // Adicionado para a raça
 
   String? _selectedSex;
   String? _selectedSize;
@@ -45,10 +48,8 @@ class _PetRegistrationState extends State<PetRegistration> {
 
   Future<void> _buscarCEP() async {
     try {
-      // Busca os dados do CEP usando o CEPService
       final endereco = await CEPService.buscarCEP(_cepController.text);
 
-      // Preenche os campos com os dados retornados
       setState(() {
         _logradouroController.text = endereco['logradouro'] ?? '';
         _bairroController.text = endereco['bairro'] ?? '';
@@ -56,7 +57,6 @@ class _PetRegistrationState extends State<PetRegistration> {
         _estadoController.text = endereco['uf'] ?? '';
       });
     } catch (e) {
-      // Exibe uma mensagem de erro
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
@@ -65,21 +65,21 @@ class _PetRegistrationState extends State<PetRegistration> {
 
   void _clearFields() {
     _nameController.clear();
-    _ageController.clear();
+    _birthdateController.clear();
     _healthController.clear();
     _cepController.clear();
     _logradouroController.clear();
     _bairroController.clear();
     _cidadeController.clear();
     _estadoController.clear();
-    _specialNeedsController.clear();
-    _historyController.clear();
-    _speciesController.clear();
     setState(() {
       _image = null;
       _selectedSex = null;
       _selectedSize = null;
       _selectedTemperament = null;
+      _specialNeeds = null;
+      _selectedSpecies = null;
+      _selectedBreed = null;
     });
   }
 
@@ -141,43 +141,82 @@ class _PetRegistrationState extends State<PetRegistration> {
     return null;
   }
 
-  String? _validateAge(String? value) {
+  String? _validateDate(String? value) {
     if (value == null || value.isEmpty) {
       return 'Campo obrigatório!';
     }
-    if (int.tryParse(value) == null) {
-      return 'A idade deve ser um número.';
+    try {
+      DateFormat('dd/MM/yyyy').parse(value); // Tenta parse a data
+    } catch (e) {
+      return 'Data inválida';
     }
     return null;
+  }
+
+  Map<String, int> _calculateAge(DateTime birthdate) {
+    final today = DateTime.now();
+    int years = today.year - birthdate.year;
+    int months = today.month - birthdate.month;
+    int days = today.day - birthdate.day;
+
+    if (days < 0) {
+      months--;
+      days += DateTime(today.year, today.month, 0).day; // Ajusta os dias
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12; // Ajusta os meses
+    }
+
+    return {'years': years, 'months': months, 'days': days};
+  }
+
+  String _formatAge(int years, int months, int days) {
+    return '$years anos, $months meses, $days dias';
   }
 
   void _registerPet() async {
     if (_formKey.currentState!.validate()) {
       try {
+        final User? user = FirebaseAuth.instance.currentUser;
+        final String? userUid = user?.uid;
+
+        if (userUid == null) {
+          throw Exception("Usuário não está logado.");
+        }
+
         String petId = Uuid().v4();
 
-        // Converter a imagem para base64
         String? fotoBase64;
         if (_image != null) {
           fotoBase64 = base64Encode(_image!.readAsBytesSync());
         }
 
+        final birthdateString = _birthdateController.text;
+        final birthdate = DateFormat('dd/MM/yyyy').parse(birthdateString);
+        final ageData = _calculateAge(birthdate);
+
+        final ageFormatted =
+            _formatAge(ageData['years']!, ageData['months']!, ageData['days']!);
+
         Pet novoPet = Pet(
           id: petId,
           nome: _nameController.text,
           foto: fotoBase64 ?? "",
-          idade: int.parse(_ageController.text),
+          idade: ageFormatted,
           porte: _selectedSize ?? "",
           sexo: _selectedSex ?? "",
           temperamento: _selectedTemperament ?? "",
           estadoDeSaude: _healthController.text,
           endereco:
               "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}",
-          necessidades: _specialNeedsController.text,
+          necessidades: _specialNeeds ?? "",
           historia: _historyController.text,
           status: "Disponível",
-          voluntarioId:
-              "voluntarioIdAqui", // Substitua pelo ID do voluntário logado
+          especie: _selectedSpecies ?? "",
+          raca: _selectedBreed ?? "",
+          voluntarioUid: userUid,
           dataCriacao: DateTime.now(),
           dataAtualizacao: DateTime.now(),
         );
@@ -240,28 +279,116 @@ class _PetRegistrationState extends State<PetRegistration> {
                 validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _speciesController,
+              DropdownButtonFormField<String>(
+                value: _selectedSpecies,
                 decoration: InputDecoration(
-                  labelText: 'Espécie/Raça',
+                  labelText: 'Espécie',
                   border: OutlineInputBorder(),
                 ),
+                items: ['Canino', 'Felino']
+                    .map((species) => DropdownMenuItem(
+                          value: species,
+                          child: Text(species),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedSpecies = value;
+                  });
+                },
                 validator: _validateRequiredField,
+              ),
+              SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedBreed,
+                decoration: InputDecoration(
+                  labelText: 'Raça',
+                  border: OutlineInputBorder(),
+                ),
+                items: _selectedSpecies == 'Canino'
+                    ? [
+                        'Sem raça definida',
+                        'Labrador',
+                        'Bulldog',
+                        'Pinscher',
+                        'Beagle',
+                        'Poodle',
+                        'Chihuahua',
+                        'Rottweiler',
+                        'Dachshund',
+                        'Boxer',
+                        'Pastor Alemão',
+                        'Golden Retriever',
+                        'Shih Tzu',
+                        'Cocker Spaniel',
+                        'Pug',
+                        'Border Collie',
+                        'Akita',
+                        'Husky Siberiano',
+                        'São Bernardo',
+                        'Maltês',
+                        'Schnauzer',
+                        'Spitz Alemão',
+                        'Buldogue Francês',
+                        'Dálmata',
+                        'Basset Hound',
+                        'Shiba Inu',
+                        'Outra',
+                      ]
+                        .map((breed) => DropdownMenuItem(
+                              value: breed,
+                              child: Text(breed),
+                            ))
+                        .toList()
+                    : [
+                        'Sem raça definida',
+                        'Siamês',
+                        'Persa',
+                        'Maine Coon',
+                        'Ragdoll',
+                        'Bengal',
+                        'Sphynx',
+                        'Outra',
+                      ]
+                        .map((breed) => DropdownMenuItem(
+                              value: breed,
+                              child: Text(breed),
+                            ))
+                        .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedBreed = value;
+                  });
+                },
+                validator: _validateRequiredField,
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _birthdateController,
+                decoration: InputDecoration(
+                  labelText: 'Data de Nascimento',
+                  border: OutlineInputBorder(),
+                ),
+                validator: _validateDate,
+                keyboardType: TextInputType.datetime,
+                onTap: () async {
+                  final pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1900),
+                    lastDate: DateTime.now(),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _birthdateController.text =
+                          DateFormat('dd/MM/yyyy').format(pickedDate);
+                    });
+                  }
+                },
               ),
               SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _ageController,
-                      decoration: InputDecoration(
-                        labelText: 'Idade',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: _validateAge,
-                    ),
-                  ),
-                  SizedBox(width: 20),
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _selectedSex,
@@ -284,11 +411,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                           value == null ? 'Campo obrigatório' : null,
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Row(
-                children: [
+                  SizedBox(width: 20),
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _selectedSize,
@@ -311,7 +434,11 @@ class _PetRegistrationState extends State<PetRegistration> {
                           value == null ? 'Campo obrigatório' : null,
                     ),
                   ),
-                  SizedBox(width: 20),
+                ],
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: _selectedTemperament,
@@ -364,9 +491,10 @@ class _PetRegistrationState extends State<PetRegistration> {
                     flex: 1,
                     child: ElevatedButton(
                       onPressed: _buscarCEP,
-                      child: Text("Buscar"),
+                      child: Text("Buscar CEP"),
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 15),
+                        backgroundColor: Color(0xFF50BB88),
+                        foregroundColor: (Colors.white),
                       ),
                     ),
                   ),
@@ -379,7 +507,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   labelText: 'Logradouro',
                   border: OutlineInputBorder(),
                 ),
-                enabled: false,
+                validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -388,7 +516,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   labelText: 'Bairro',
                   border: OutlineInputBorder(),
                 ),
-                enabled: false,
+                validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -397,7 +525,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   labelText: 'Cidade',
                   border: OutlineInputBorder(),
                 ),
-                enabled: false,
+                validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -406,47 +534,41 @@ class _PetRegistrationState extends State<PetRegistration> {
                   labelText: 'Estado',
                   border: OutlineInputBorder(),
                 ),
-                enabled: false,
+                validator: _validateRequiredField,
               ),
               SizedBox(height: 20),
-              TextFormField(
-                controller: _specialNeedsController,
+              DropdownButtonFormField<String>(
+                value: _specialNeeds,
                 decoration: InputDecoration(
-                  labelText: 'Possui necessidades especiais?',
+                  labelText: 'Possui Necessidades Especiais?',
                   border: OutlineInputBorder(),
                 ),
-                validator: _validateRequiredField,
+                items: ['Sim', 'Não']
+                    .map((need) => DropdownMenuItem(
+                          value: need,
+                          child: Text(need),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _specialNeeds = value;
+                  });
+                },
+                validator: (value) =>
+                    value == null ? 'Campo obrigatório' : null,
               ),
               SizedBox(height: 20),
               TextFormField(
                 controller: _historyController,
-                maxLines: 3,
                 decoration: InputDecoration(
                   labelText: 'História',
                   border: OutlineInputBorder(),
                 ),
-                validator: _validateRequiredField,
               ),
-              SizedBox(height: 40),
-              Container(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _registerPet,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF50BB88),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  child: Text(
-                    'Cadastrar Pet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                  ),
-                ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _registerPet,
+                child: Text('Cadastrar Pet'),
               ),
             ],
           ),
