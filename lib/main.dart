@@ -1,4 +1,5 @@
 import 'package:deu_pet/pages/chat/chat_list.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,6 +25,8 @@ void main() async {
     'gjp3ycatuazs',
     logLevel: Level.INFO,
   );
+
+  await FirebaseAuth.instance.signOut();
 
   runApp(MyApp(client: client));
 }
