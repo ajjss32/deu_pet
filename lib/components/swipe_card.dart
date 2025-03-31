@@ -185,8 +185,11 @@ class _SwipeCardState extends State<SwipeCard> {
                                     dataRejeicao: DateTime.now(),
                                   ));
 
+                                  int indexToRemove =
+                                      _pets.indexWhere((p) => p.id == pet.id);
+
                                   setState(() {
-                                    _pets.removeAt(0);
+                                    _pets.removeAt(indexToRemove);
                                   });
 
                                   controller.swipe(CardSwiperDirection.left);
@@ -233,8 +236,11 @@ class _SwipeCardState extends State<SwipeCard> {
 
                                   PetService().atualizarPet(pet, context);
 
+                                  int indexToRemove =
+                                      _pets.indexWhere((p) => p.id == pet.id);
+
                                   setState(() {
-                                    _pets.removeAt(0);
+                                    _pets.removeAt(indexToRemove);
                                   });
 
                                   controller.swipe(CardSwiperDirection.right);
