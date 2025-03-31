@@ -7,8 +7,6 @@ import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
-import 'package:deu_pet/services/validators.dart';
-import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -21,15 +19,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _telefoneController = TextEditingController();
+  final TextEditingController _descricaoController = TextEditingController();
+  final TextEditingController _dataNascimentoController =
+      TextEditingController();
+  final TextEditingController _cpfCnpjController = TextEditingController();
   final TextEditingController _cepController = TextEditingController();
   final TextEditingController _logradouroController = TextEditingController();
   final TextEditingController _bairroController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
-  final TextEditingController _descricaoController = TextEditingController();
-  final TextEditingController _dataNascimentoController =
-      TextEditingController();
-  final TextEditingController _cpfCnpjController = TextEditingController();
   String? _selectedTipo;
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -45,12 +43,52 @@ class _RegistrationPageState extends State<RegistrationPage> {
     }
   }
 
+  bool validarCPF(String cpf) {
+    cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cpf.length != 11) return false;
+
+    // Verifica se todos os dígitos são iguais
+    if (RegExp(r'^(\d)\1*$').hasMatch(cpf)) return false;
+
+    // Validação do CPF
+    for (int i = 9; i < 11; i++) {
+      int soma = 0;
+      for (int j = 0; j < i; j++) {
+        soma += int.parse(cpf[j]) * (i + 1 - j);
+      }
+      int resto = soma % 11;
+      int digito = resto < 2 ? 0 : 11 - resto;
+      if (digito != int.parse(cpf[i])) return false;
+    }
+    return true;
+  }
+
+  bool validarCNPJ(String cnpj) {
+    cnpj = cnpj.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cnpj.length != 14) return false;
+
+    // Verifica se todos os dígitos são iguais
+    if (RegExp(r'^(\d)\1*$').hasMatch(cnpj)) return false;
+
+    // Validação do CNPJ
+    for (int i = 12; i < 14; i++) {
+      int soma = 0;
+      int peso = i - 7;
+      for (int j = 0; j < i; j++) {
+        soma += int.parse(cnpj[j]) * peso;
+        peso = peso == 2 ? 9 : peso - 1;
+      }
+      int resto = soma % 11;
+      int digito = resto < 2 ? 0 : 11 - resto;
+      if (digito != int.parse(cnpj[i])) return false;
+    }
+    return true;
+  }
+
   Future<void> _buscarCEP() async {
     try {
-      // Busca os dados do CEP usando o CEPService
-      final endereco = await CEPService.buscarCEP(_cepController.text);
-
-      // Preenche os campos com os dados retornados
+      final endereco =
+          await _usuarioService.buscarEnderecoPorCEP(_cepController.text);
       setState(() {
         _logradouroController.text = endereco['logradouro'] ?? '';
         _bairroController.text = endereco['bairro'] ?? '';
@@ -58,10 +96,26 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _estadoController.text = endereco['uf'] ?? '';
       });
     } catch (e) {
-      // Exibe uma mensagem de erro
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
       );
+    }
+  }
+
+  Future<void> _selecionarDataNascimento() async {
+    final DateTime? dataSelecionada = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (dataSelecionada != null) {
+      final formattedDate =
+          "${dataSelecionada.day.toString().padLeft(2, '0')}/${dataSelecionada.month.toString().padLeft(2, '0')}/${dataSelecionada.year}";
+      setState(() {
+        _dataNascimentoController.text = formattedDate;
+      });
     }
   }
 
@@ -135,20 +189,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   enabled: false),
               _buildTextField(_estadoController, "Estado", Icons.flag,
                   enabled: false),
-              _buildTextField(_descricaoController, "Descrição", Icons.info),
-              _buildTextField(_dataNascimentoController, "Data de Nascimento",
-                  Icons.calendar_today),
-              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge,
-                  validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Campo obrigatório";
-                }
-                if (!Validators.validarCPF(value) &&
-                    !Validators.validarCNPJ(value)) {
-                  return "CPF ou CNPJ inválido";
-                }
-                return null;
-              }),
+              _buildDescricaoField(
+                  _descricaoController, "Descrição", Icons.info),
+              GestureDetector(
+                onTap: _selecionarDataNascimento,
+                child: AbsorbPointer(
+                  child: _buildTextField(_dataNascimentoController,
+                      "Data de Nascimento", Icons.calendar_today),
+                ),
+              ),
+              _buildTextField(_cpfCnpjController, "CPF/CNPJ", Icons.badge),
               DropdownButtonFormField<String>(
                 value: _selectedTipo,
                 decoration: InputDecoration(
@@ -212,7 +262,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   },
                   child: Text(
                     "Já tem uma conta? Entrar",
-                    style: TextStyle(color: Colors.grey), // Define a cor cinza
+                    style: TextStyle(color: Colors.grey),
                   ),
                 ),
               ),
@@ -227,8 +277,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       TextEditingController controller, String label, IconData icon,
       {bool obscureText = false,
       TextInputType keyboardType = TextInputType.text,
-      bool enabled = true,
-      String? Function(String?)? validator}) {
+      bool enabled = true}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -252,14 +301,65 @@ class _RegistrationPageState extends State<RegistrationPage> {
         obscureText: obscureText,
         keyboardType: keyboardType,
         enabled: enabled,
-        validator:
-            validator ?? (value) => value!.isEmpty ? "Campo obrigatório" : null,
+        validator: (value) => value!.isEmpty ? "Campo obrigatório" : null,
+      ),
+    );
+  }
+
+  Widget _buildDescricaoField(
+      TextEditingController controller, String label, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            height: 100,
+            decoration: BoxDecoration(
+              border: Border.all(color: Color(0xFFCCCCCE), width: 0.5),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: controller,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                ),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Future<void> _registerUser() async {
     if (_formKey.currentState!.validate()) {
+      // Validação de CPF/CNPJ
+      if (!validarCPF(_cpfCnpjController.text) &&
+          !validarCNPJ(_cpfCnpjController.text)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("CPF/CNPJ inválido")),
+        );
+        return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Cadastrando...")),
       );
