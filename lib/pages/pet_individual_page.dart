@@ -127,7 +127,7 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
         children: [
           InfoWidget(
               title: 'Espécie/Raça',
-              value: widget.data['especie'] ?? 'Desconhecido'),
+              value: (widget.data['especie'] ?? 'Desconhecido') + ' / ' + (widget.data['raca'] ?? 'Desconhecido')),
           InfoWidget(
               title: 'História',
               value: widget.data['historia'] ?? 'Sem informação'),
@@ -135,14 +135,14 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
               title: 'Idade', value: widget.data['idade'] ?? 'Não informado'),
           InfoWidget(
               title: 'Estado de saúde',
-              value: widget.data['estadoDeSaudee'] ?? 'Não informado'),
+              value: widget.data['estadoDeSaude'] ?? 'Não informado'),
           InfoWidget(
               title: 'Sexo', value: widget.data['sexo'] ?? 'Não informado'),
           InfoWidget(
               title: 'Localização',
               value: widget.data['endereco'] ?? 'Não informado'),
           InfoWidget(
-              title: 'Porte', value: widget.data['tamanho'] ?? 'Não informado'),
+              title: 'Porte', value: widget.data['porte'] ?? 'Não informado'),
           InfoWidget(
               title: 'Necessidades especiais',
               value: widget.data['necessidades'] ?? 'Nenhuma'),

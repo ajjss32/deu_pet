@@ -111,7 +111,7 @@ class PetDetailsPage extends StatelessWidget {
               children: [
                 InfoWidget(title: 'Nome', value: data.nome, fontSize: 14),
                 InfoWidget(
-                    title: 'Espécie/Raça', value: data.especie, fontSize: 14),
+                    title: 'Espécie/Raça', value: data.especie + '/' + data.raca, fontSize: 14),
                 InfoWidget(
                     title: 'Idade', value: '${data.idade} anos', fontSize: 14),
                 InfoWidget(title: 'Sexo', value: data.sexo, fontSize: 14),
