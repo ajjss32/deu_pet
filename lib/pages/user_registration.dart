@@ -9,12 +9,12 @@ import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
 import 'package:deu_pet/services/validators.dart';
 import 'package:deu_pet/services/cep_service.dart'; // Importe o CEPService
-import 'package:stream_chat_flutter/stream_chat_flutter.dart'; 
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class RegistrationPage extends StatefulWidget {
   final StreamChatClient client;
 
-  RegistrationPage({required this.client}); 
+  RegistrationPage({required this.client});
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -212,7 +212,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginPage(client: widget.client)),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              LoginPage(client: widget.client)),
                     );
                   },
                   child: Text(
@@ -312,12 +314,27 @@ class _RegistrationPageState extends State<RegistrationPage> {
         // Navega para a tela de login
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginPage(client: widget.client)),
+          MaterialPageRoute(
+              builder: (context) => LoginPage(client: widget.client)),
         );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erro ao cadastrar usuário: $e")),
-        );
+        if (e is FirebaseAuthException && e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("A senha deve ter pelo menos 6 caracteres"),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Erro desconhecido. Tente novamente."),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
       }
     }
   }
