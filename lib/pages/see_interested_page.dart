@@ -1,7 +1,13 @@
+import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/services/favorito_service.dart';
+import 'package:deu_pet/services/match_service.dart';
+import 'package:deu_pet/services/pet_service.dart';
+import 'package:deu_pet/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'deu_pet_page.dart'; // Importa a tela de chat
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'deu_pet_page.dart';
+import 'package:deu_pet/model/match.dart';
 
 class SeeInterestedPage extends StatefulWidget {
   final Map<String, dynamic> dataPet;
@@ -16,6 +22,8 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
   // Lista de interessados com suas informações
   final List<Usuario> interestedPeople = [];
   final FavoritoService favoritoService = FavoritoService();
+  final UsuarioService usuarioService = UsuarioService();
+  final MatchService matchService = MatchService();
   // final List<Map<String, String>> interestedPeople = [
   //   {
   //     'name': 'Maria Oliveira',
@@ -53,9 +61,13 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
     final list = await favoritoService.buscarFavoritosPorPet(
         widget.dataPet['id'], context);
     print(list);
-    // setState(() {
-    //   interestedPeople.addAll(list);
-    // });
+    for (var item in list) {
+      final user = await usuarioService.buscarUsuarioPorUid(item.usuarioId);
+      if (user != null) {
+        interestedPeople.add(user);
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -103,8 +115,28 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
                   ],
                 ),
                 trailing: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     // Redireciona para a tela de chat ao clicar no coração
+
+                    //criar match
+                    Match match = Match(
+                      id: Uuid().v1(),
+                      petId: widget.dataPet['id'],
+                      usuarioId: interestedPeople[index].uid,
+                      status: '',
+                      data: DateTime.now(),
+                    );
+
+                    await matchService.criarMatch(match);
+
+                    Pet pet = Pet.fromMap(widget.dataPet);
+                    pet = pet.copyWith(
+                      status: 'Aguardando adoção',
+                      dataAtualizacao: DateTime.now(),
+                    );
+
+                    PetService().atualizarPet(pet, context);
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(

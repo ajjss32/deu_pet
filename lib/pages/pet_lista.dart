@@ -238,6 +238,8 @@ class _PetListScreenState extends State<PetListScreen> {
     switch (status) {
       case 'Aguardando confirmação':
         return Colors.orange;
+      case 'Aguardando adoção':
+        return Colors.green;  
       case 'Adotado':
         return Colors.green;
       case 'Disponível':

@@ -80,4 +80,44 @@ class Pet {
       dataAtualizacao: DateTime.parse(map['data_atualizacao'] ?? ''),
     );
   }
+
+  Pet copyWith({
+    String? id,
+    String? nome,
+    String? foto,
+    String? idade,
+    String? especie,
+    String? raca,
+    String? porte,
+    String? sexo,
+    String? temperamento,
+    String? estadoDeSaude,
+    String? endereco,
+    String? necessidades,
+    String? historia,
+    String? status,
+    String? voluntarioUid,
+    DateTime? dataCriacao,
+    DateTime? dataAtualizacao,
+  }) {
+    return Pet(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      foto: foto ?? this.foto,
+      idade: idade ?? this.idade,
+      especie: especie ?? this.especie,
+      raca: raca ?? this.raca,
+      porte: porte ?? this.porte,
+      sexo: sexo ?? this.sexo,
+      temperamento: temperamento ?? this.temperamento,
+      estadoDeSaude: estadoDeSaude ?? this.estadoDeSaude,
+      endereco: endereco ?? this.endereco,
+      necessidades: necessidades ?? this.necessidades,
+      historia: historia ?? this.historia,
+      status: status ?? this.status,
+      voluntarioUid: voluntarioUid ?? this.voluntarioUid,
+      dataCriacao: dataCriacao ?? this.dataCriacao,
+      dataAtualizacao: dataAtualizacao ?? this.dataAtualizacao,
+    );
+  }
 }

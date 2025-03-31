@@ -53,7 +53,7 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  widget.data['name'] ?? 'Nome Desconhecido',
+                  widget.data['nome'] ?? 'Nome Desconhecido',
                   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 8),
@@ -114,25 +114,25 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
         children: [
           InfoWidget(
               title: 'Espécie/Raça',
-              value: widget.data['species'] ?? 'Desconhecido'),
+              value: widget.data['especie'] ?? 'Desconhecido'),
           InfoWidget(
               title: 'História',
-              value: widget.data['history'] ?? 'Sem informação'),
+              value: widget.data['historia'] ?? 'Sem informação'),
           InfoWidget(
-              title: 'Idade', value: widget.data['age'] ?? 'Não informado'),
+              title: 'Idade', value: widget.data['idade'] ?? 'Não informado'),
           InfoWidget(
               title: 'Estado de saúde',
-              value: widget.data['healthState'] ?? 'Não informado'),
+              value: widget.data['estadoDeSaudee'] ?? 'Não informado'),
           InfoWidget(
-              title: 'Sexo', value: widget.data['sex'] ?? 'Não informado'),
+              title: 'Sexo', value: widget.data['sexo'] ?? 'Não informado'),
           InfoWidget(
               title: 'Localização',
-              value: widget.data['localization'] ?? 'Não informado'),
+              value: widget.data['endereco'] ?? 'Não informado'),
           InfoWidget(
-              title: 'Porte', value: widget.data['size'] ?? 'Não informado'),
+              title: 'Porte', value: widget.data['tamanho'] ?? 'Não informado'),
           InfoWidget(
               title: 'Necessidades especiais',
-              value: widget.data['needSpecialCare'] ?? 'Nenhuma'),
+              value: widget.data['necessidades'] ?? 'Nenhuma'),
         ],
       ),
     );
