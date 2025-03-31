@@ -58,9 +58,47 @@ class _FavoritePageState extends State<FavoritePage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Erro ao carregar favoritos'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.pets,
+                          size: 100,
+                          color: Colors.grey[300],
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Erro ao carregar favoritos',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('Nenhum favorito encontrado'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.pets,
+                          size: 100,
+                          color: Colors.grey[300],
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Nenhum favorito encontrado',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.grey[300],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
                 }
 
                 final favoritos = snapshot.data!;

@@ -24,12 +24,23 @@ class ChannelListPage extends StatelessWidget {
           ),
           emptyBuilder: (context) {
             return Center(
-              child: Text(
-                'NENHUM MATCH REALIZADO',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey,
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.pets,
+                    size: 100,
+                    color: Colors.grey[300],
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Nenhum match realizado',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.grey[300],
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -65,13 +76,11 @@ class ChannelListPage extends StatelessWidget {
                     leading: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Color(0xFF434CB8), width: 3),
+                        border: Border.all(color: Color(0xFF434CB8), width: 3),
                       ),
                       child: (petImage != null && petImage.isNotEmpty)
                           ? CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(petImage),
+                              backgroundImage: NetworkImage(petImage),
                             )
                           : StreamChannelAvatar(channel: channel),
                     ),
