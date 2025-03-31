@@ -84,6 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ElevatedButton(
                   onPressed: () async {
                     await ChatService().disconnectStreamChat(widget.client);
+                    await _auth.signOut();
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
