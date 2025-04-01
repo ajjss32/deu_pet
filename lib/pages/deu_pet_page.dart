@@ -171,13 +171,8 @@ class _MatchScreenState extends State<MatchScreen>
                                 width: 5.0,
                               ),
                               image: DecorationImage(
-                                image: petImageUrl != null &&
-                                        petImageUrl.isNotEmpty
-                                    ? NetworkImage(
-                                        petImageUrl)
-                                    : AssetImage(
-                                            'assets/images/default_pet.png')
-                                        as ImageProvider,
+                                image: NetworkImage(
+                                        petImageUrl!),
                                 fit: BoxFit.cover,
                               ),
                             ),
