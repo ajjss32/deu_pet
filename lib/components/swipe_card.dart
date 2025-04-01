@@ -113,8 +113,8 @@ class _SwipeCardState extends State<SwipeCard> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.asset(
-                              pet.foto,
+                            Image.network(
+                              pet.fotos.first,
                               fit: BoxFit.cover,
                             ),
                             Container(

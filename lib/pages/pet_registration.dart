@@ -1,8 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
+import 'dart:io';
+
+import 'package:deu_pet/services/cloudinary_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'dart:convert';
 import 'package:uuid/uuid.dart';
 import 'package:deu_pet/services/pet_service.dart';
 import 'package:deu_pet/model/pet.dart';
@@ -15,7 +19,7 @@ class PetRegistration extends StatefulWidget {
 }
 
 class _PetRegistrationState extends State<PetRegistration> {
-  File? _image;
+  List<XFile> _images = [];
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _healthController = TextEditingController();
@@ -36,12 +40,13 @@ class _PetRegistrationState extends State<PetRegistration> {
 
   final PetService _petService = PetService();
 
-  Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  Future<void> _pickImages() async {
+    final ImagePicker picker = ImagePicker();
+    final List<XFile>? pickedFiles = await picker.pickMultiImage();
+
+    if (pickedFiles != null && pickedFiles.isNotEmpty) {
       setState(() {
-        _image = File(pickedFile.path);
+        _images.addAll(pickedFiles);
       });
     }
   }
@@ -72,14 +77,16 @@ class _PetRegistrationState extends State<PetRegistration> {
     _bairroController.clear();
     _cidadeController.clear();
     _estadoController.clear();
+    _historyController.clear();
     setState(() {
-      _image = null;
+      _images = [];
       _selectedSex = null;
       _selectedSize = null;
       _selectedTemperament = null;
       _specialNeeds = null;
       _selectedSpecies = null;
       _selectedBreed = null;
+      _historyController.text = '';
     });
   }
 
@@ -177,6 +184,13 @@ class _PetRegistrationState extends State<PetRegistration> {
   }
 
   void _registerPet() async {
+    if (_images.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Selecione ao menos uma imagem!')),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       try {
         final User? user = FirebaseAuth.instance.currentUser;
@@ -188,9 +202,14 @@ class _PetRegistrationState extends State<PetRegistration> {
 
         String petId = Uuid().v4();
 
-        String? fotoBase64;
-        if (_image != null) {
-          fotoBase64 = base64Encode(_image!.readAsBytesSync());
+        List<String> urls = [];
+        if (!_images.isEmpty) {
+          for (XFile image in _images) {
+            String? url = await uploadImageToCloudinary(image);
+            if (url != null) {
+              urls.add(url);
+            }
+          }
         }
 
         final birthdateString = _birthdateController.text;
@@ -203,7 +222,7 @@ class _PetRegistrationState extends State<PetRegistration> {
         Pet novoPet = Pet(
           id: petId,
           nome: _nameController.text,
-          foto: fotoBase64 ?? "",
+          fotos: urls,
           idade: ageFormatted,
           porte: _selectedSize ?? "",
           sexo: _selectedSex ?? "",
@@ -248,24 +267,10 @@ class _PetRegistrationState extends State<PetRegistration> {
             children: [
               Center(
                 child: GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: 130,
-                    height: 130,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      shape: BoxShape.circle,
-                      image: _image != null
-                          ? DecorationImage(
-                              image: FileImage(_image!),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: _image == null
-                        ? Icon(Icons.add_a_photo,
-                            size: 50, color: Colors.grey[600])
-                        : null,
+                  onTap: _pickImages,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: _buildSelectedImages(),
                   ),
                 ),
               ),
@@ -574,6 +579,70 @@ class _PetRegistrationState extends State<PetRegistration> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSelectedImages() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+      ),
+      itemCount: _images.length + 1,
+      itemBuilder: (context, index) {
+        if (index == _images.length) {
+          return GestureDetector(
+            onTap: _pickImages,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.add_a_photo, size: 30, color: Colors.grey[700]),
+            ),
+          );
+        } else {
+          final image = _images[index];
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: kIsWeb
+                      ? Image.network(image.path, fit: BoxFit.cover)
+                      : Image.memory(
+                          Uint8List.fromList(
+                              File(image.path).readAsBytesSync()),
+                          fit: BoxFit.cover,
+                        ),
+                ),
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _images.removeAt(index);
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withOpacity(0.6),
+                    ),
+                    padding: EdgeInsets.all(4),
+                    child: Icon(Icons.close, color: Colors.white, size: 20),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 }

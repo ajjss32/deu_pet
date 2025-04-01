@@ -81,7 +81,7 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
   }
 
   Widget _buildImageCarousel() {
-    List<dynamic> images = widget.data['image'] ?? [];
+    List<dynamic> images = widget.data['fotos'] ?? [];
 
     if (images.isEmpty) {
       images = [

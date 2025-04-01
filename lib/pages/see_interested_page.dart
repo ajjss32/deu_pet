@@ -101,7 +101,7 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
                         BorderRadius.circular(10.0), // Bordas arredondadas
                     image: DecorationImage(
                       // image: AssetImage(interestedPeople[index]['image']!),
-                      image: AssetImage(interestedPeople[index].foto),
+                      image: NetworkImage(interestedPeople[index].foto),
                       fit: BoxFit.cover, // Ajusta a imagem para cobrir o espaço
                     ),
                   ),

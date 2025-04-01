@@ -1,5 +1,4 @@
-import 'dart:io';
-import 'dart:convert';
+import 'package:deu_pet/services/cloudinary_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -34,7 +33,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
   String? _selectedTipo;
-  File? _selectedImage;
+  XFile? _selectedImage;
   final ImagePicker _picker = ImagePicker();
   final AuthService _authService = AuthService();
   final UsuarioService _usuarioService = UsuarioService();
@@ -43,7 +42,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path);
+        _selectedImage = pickedFile;
       });
     }
   }
@@ -374,10 +373,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
 
       try {
-        // Converte a imagem para Base64, se existir
-        String? fotoBase64;
+        String? imageUrl;
         if (_selectedImage != null) {
-          fotoBase64 = base64Encode(_selectedImage!.readAsBytesSync());
+          imageUrl = await uploadImageToCloudinary(_selectedImage!);
         }
 
         // Cria o usuário no Firebase Auth e obtém o UID
@@ -394,7 +392,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           uid: uid, // UID vindo do Firebase Auth
           cpf_cnpj: _cpfCnpjController.text,
           email: _emailController.text,
-          foto: fotoBase64 ?? "",
+          foto: imageUrl ?? "",
           tipo: _selectedTipo ?? "",
           nome: _nameController.text,
           telefone: _telefoneController.text,

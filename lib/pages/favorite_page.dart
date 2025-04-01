@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deu_pet/model/favorito.dart';
 import 'package:deu_pet/model/pet.dart';
 import 'package:deu_pet/pages/pet_individual_page.dart';
@@ -179,8 +178,8 @@ class _FavoritePageState extends State<FavoritePage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.network(
-                  pet.foto.isNotEmpty
-                      ? pet.foto
+                  pet.fotos.isNotEmpty
+                      ? pet.fotos.first
                       : 'https://via.placeholder.com/150',
                   fit: BoxFit.cover,
                 ),

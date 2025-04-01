@@ -190,9 +190,8 @@ class _PetListScreenState extends State<PetListScreen> {
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
-                  //TODO: imagem place holder, subtituir
-                  data.foto,
+                child: Image.network(
+                  data.fotos.first,
                   fit: BoxFit.cover,
                 ),
               ),

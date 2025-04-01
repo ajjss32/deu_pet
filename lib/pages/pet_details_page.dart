@@ -31,9 +31,7 @@ class PetDetailsPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SeeInterestedPage(
-                        dataPet: data.toMap(),
-                        client:
-                            client),
+                        dataPet: data.toMap(), client: client),
                   ),
                 );
               },
@@ -54,16 +52,14 @@ class PetDetailsPage extends StatelessWidget {
         Expanded(
           flex: 20,
           child: Padding(
-            padding: const EdgeInsets.all(8.0), // Menor padding geral
+            padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
-              // itemCount: data['image'].length,
-              //TODO: nao existe uma lista de imagens no objeto pet
-              itemCount: 0,
+              itemCount: data.fotos.length,
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 return Container(
-                  padding: const EdgeInsets.all(4.0), // Menor padding
-                  width: 180, // Menor largura para visualização mobile
+                  padding: const EdgeInsets.all(4.0),
+                  width: 180,
                   height: 220,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(
@@ -72,9 +68,8 @@ class PetDetailsPage extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      // data['image'][index],
-                      data.foto,
+                    child: Image.network(
+                      data.fotos[index],
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -111,7 +106,9 @@ class PetDetailsPage extends StatelessWidget {
               children: [
                 InfoWidget(title: 'Nome', value: data.nome, fontSize: 14),
                 InfoWidget(
-                    title: 'Espécie/Raça', value: data.especie + '/' + data.raca, fontSize: 14),
+                    title: 'Espécie/Raça',
+                    value: data.especie + '/' + data.raca,
+                    fontSize: 14),
                 InfoWidget(
                     title: 'Idade', value: '${data.idade} anos', fontSize: 14),
                 InfoWidget(title: 'Sexo', value: data.sexo, fontSize: 14),

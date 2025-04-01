@@ -1,7 +1,7 @@
 class Pet {
   String id;
   String nome;
-  String foto;
+  List<String> fotos;
   String idade;
   String especie;
   String raca;
@@ -20,7 +20,7 @@ class Pet {
   Pet({
     required this.id,
     required this.nome,
-    required this.foto,
+    required this.fotos,
     required this.idade,
     required this.especie,
     required this.raca,
@@ -41,7 +41,7 @@ class Pet {
     return {
       'id': id,
       'nome': nome,
-      'foto': foto,
+      'fotos': fotos,
       'idade': idade,
       'especie': especie,
       'raca': raca,
@@ -63,7 +63,7 @@ class Pet {
     return Pet(
       id: map['id'],
       nome: map['nome'],
-      foto: map['foto'],
+      fotos: List<String>.from(map['fotos'] ?? []),
       idade: map['idade'].toString(),
       especie: map['especie'] ?? '',
       raca: map['raca'] ?? '',
@@ -84,7 +84,7 @@ class Pet {
   Pet copyWith({
     String? id,
     String? nome,
-    String? foto,
+    List<String>? fotos,
     String? idade,
     String? especie,
     String? raca,
@@ -103,7 +103,7 @@ class Pet {
     return Pet(
       id: id ?? this.id,
       nome: nome ?? this.nome,
-      foto: foto ?? this.foto,
+      fotos: fotos ?? this.fotos,
       idade: idade ?? this.idade,
       especie: especie ?? this.especie,
       raca: raca ?? this.raca,
