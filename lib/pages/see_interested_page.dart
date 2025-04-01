@@ -149,7 +149,7 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
                         user!.uid,
                         interestedPeople[index].nome,
                         widget.dataPet['nome'],
-                        widget.dataPet['foto'],
+                        widget.dataPet['fotos'][0],
                         widget.client);
 
                     Navigator.push(

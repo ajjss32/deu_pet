@@ -94,6 +94,8 @@ class _MatchScreenState extends State<MatchScreen>
 
   @override
   Widget build(BuildContext context) {
+    String? petImageUrl = widget.chat.extraData['pet_image'] as String?;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -169,7 +171,13 @@ class _MatchScreenState extends State<MatchScreen>
                                 width: 5.0,
                               ),
                               image: DecorationImage(
-                                image: AssetImage('assets/images/pet1.png'),
+                                image: petImageUrl != null &&
+                                        petImageUrl.isNotEmpty
+                                    ? NetworkImage(
+                                        petImageUrl)
+                                    : AssetImage(
+                                            'assets/images/default_pet.png')
+                                        as ImageProvider,
                                 fit: BoxFit.cover,
                               ),
                             ),
