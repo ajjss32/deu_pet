@@ -2,7 +2,6 @@ import 'package:deu_pet/pages/chat/chat_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:deu_pet/pages/favorite_page.dart';
 import 'package:deu_pet/pages/profile_page.dart';
 import 'package:deu_pet/pages/login_page.dart';
@@ -13,13 +12,14 @@ import 'components/custom_bottom_nav_bar.dart';
 import 'components/custom_bottom_nav_bar_ong.dart';
 import 'components/swipe_card.dart';
 import 'firebase_options.dart';
-import 'package:deu_pet/model/user.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'web_config.dart';
 
 void main() async {
-  setUrlStrategy(PathUrlStrategy());
   WidgetsFlutterBinding.ensureInitialized();
+
+  configureApp();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
