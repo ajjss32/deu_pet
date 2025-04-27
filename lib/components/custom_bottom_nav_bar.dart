@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -19,7 +20,32 @@ class CustomBottomNavBar extends StatelessWidget {
           label: 'Favoritos',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
+          icon: StreamBuilder<int>(
+            stream: StreamChat.of(context).client.state.totalUnreadCountStream,
+            builder: (context, snapshot) {
+              final unreadCount = snapshot.data ?? 0;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(Icons.chat),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: -4,
+                      top: -4,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF4E59D9),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           label: 'Chat',
         ),
         BottomNavigationBarItem(

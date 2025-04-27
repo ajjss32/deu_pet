@@ -10,9 +10,6 @@ class PetService {
     try {
       // Verifique se o ID do pet já existe antes de cadastrar
       await petsCollection.doc(pet.id).set(pet.toMap());
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pet cadastrado com sucesso!')),
-      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao cadastrar pet: $e')),

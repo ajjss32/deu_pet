@@ -84,11 +84,14 @@ class _SwipeCardState extends State<SwipeCard> {
                     color: Colors.grey[300],
                   ),
                   SizedBox(height: 16),
-                  Text(
-                    'Não há mais pets disponíveis para você no momento.',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.grey[300],
+                  Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Não há mais pets disponíveis para você no momento.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey[300],
+                      ),
                     ),
                   ),
                 ],
@@ -101,6 +104,11 @@ class _SwipeCardState extends State<SwipeCard> {
                     controller: controller,
                     cardsCount: _pets.length,
                     onSwipe: (previousIndex, currentIndex, direction) {
+                      if (direction == CardSwiperDirection.left) {
+                        _handleRejeicao(_pets[previousIndex]);
+                      } else if (direction == CardSwiperDirection.right) {
+                        _handleFavorito(_pets[previousIndex]);
+                      }
                       return true;
                     },
                     numberOfCardsDisplayed: 1,
@@ -148,7 +156,8 @@ class _SwipeCardState extends State<SwipeCard> {
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                        petService.formatarIdade(pet.dataDeNascimento),
+                                        petService.formatarIdade(
+                                            pet.dataDeNascimento),
                                         style: TextStyle(
                                           fontSize: 20,
                                           color: Colors.white,
@@ -174,24 +183,6 @@ class _SwipeCardState extends State<SwipeCard> {
                                 icon: Icons.cancel,
                                 color: Color(0xFFF7566B),
                                 onPressed: () async {
-                                  final Usuario? usuario =
-                                      await authService.getUsuarioLogado();
-                                  if (usuario == null) return;
-
-                                  await rejeicaoService.criarRejeicao(Rejeicao(
-                                    id: Uuid().v1(),
-                                    usuarioId: usuario.uid,
-                                    petId: pet.id,
-                                    dataRejeicao: DateTime.now(),
-                                  ));
-
-                                  int indexToRemove =
-                                      _pets.indexWhere((p) => p.id == pet.id);
-
-                                  setState(() {
-                                    _pets.removeAt(indexToRemove);
-                                  });
-
                                   controller.swipe(CardSwiperDirection.left);
                                 },
                               ),
@@ -203,46 +194,6 @@ class _SwipeCardState extends State<SwipeCard> {
                                 icon: Icons.favorite,
                                 color: Color(0xFF20ECB9),
                                 onPressed: () async {
-                                  final Usuario? usuario =
-                                      await authService.getUsuarioLogado();
-
-                                  if (usuario == null) {
-                                    return;
-                                  }
-
-                                  // Verificar se o pet já foi adicionado
-                                  bool petJaFavorito = await favoritoService
-                                      .checarPetFavorito(usuario.uid, pet.id);
-
-                                  if (petJaFavorito) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Este pet já está nos favoritos!')),
-                                    );
-                                    return;
-                                  }
-                                  pet = pet.copyWith(
-                                    status: 'Aguardando Confirmação',
-                                  );
-
-                                  favoritoService.criarFavorito(
-                                      Favorito(
-                                        id: Uuid().v1(),
-                                        usuarioId: usuario.uid,
-                                        petId: pet.id,
-                                      ),
-                                      context);
-
-                                  PetService().atualizarPet(pet, context);
-
-                                  int indexToRemove =
-                                      _pets.indexWhere((p) => p.id == pet.id);
-
-                                  setState(() {
-                                    _pets.removeAt(indexToRemove);
-                                  });
-
                                   controller.swipe(CardSwiperDirection.right);
                                 },
                               ),
@@ -277,5 +228,51 @@ class _SwipeCardState extends State<SwipeCard> {
         ),
       ),
     );
+  }
+
+  void _handleRejeicao(Pet pet) async {
+    final Usuario? usuario = await authService.getUsuarioLogado();
+    if (usuario == null) return;
+
+    await rejeicaoService.criarRejeicao(Rejeicao(
+      id: Uuid().v1(),
+      usuarioId: usuario.uid,
+      petId: pet.id,
+      dataRejeicao: DateTime.now(),
+    ));
+
+    int indexToRemove = _pets.indexWhere((p) => p.id == pet.id);
+
+    setState(() {
+      _pets.removeAt(indexToRemove);
+    });
+  }
+
+  void _handleFavorito(Pet pet) async {
+    final Usuario? usuario = await authService.getUsuarioLogado();
+
+    if (usuario == null) {
+      return;
+    }
+
+    pet = pet.copyWith(
+      status: 'Aguardando Confirmação',
+    );
+
+    favoritoService.criarFavorito(
+        Favorito(
+          id: Uuid().v1(),
+          usuarioId: usuario.uid,
+          petId: pet.id,
+        ),
+        context);
+
+    PetService().atualizarPet(pet, context);
+
+    int indexToRemove = _pets.indexWhere((p) => p.id == pet.id);
+
+    setState(() {
+      _pets.removeAt(indexToRemove);
+    });
   }
 }
