@@ -148,7 +148,7 @@ class _SwipeCardState extends State<SwipeCard> {
                                       ),
                                       SizedBox(width: 10),
                                       Text(
-                                        pet.idade,
+                                        petService.formatarIdade(pet.dataDeNascimento),
                                         style: TextStyle(
                                           fontSize: 20,
                                           color: Colors.white,

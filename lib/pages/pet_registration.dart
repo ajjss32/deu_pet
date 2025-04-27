@@ -39,6 +39,7 @@ class _PetRegistrationState extends State<PetRegistration> {
   String? _selectedTemperament;
 
   final PetService _petService = PetService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
 
   Future<void> _pickImages() async {
     final ImagePicker picker = ImagePicker();
@@ -160,29 +161,6 @@ class _PetRegistrationState extends State<PetRegistration> {
     return null;
   }
 
-  Map<String, int> _calculateAge(DateTime birthdate) {
-    final today = DateTime.now();
-    int years = today.year - birthdate.year;
-    int months = today.month - birthdate.month;
-    int days = today.day - birthdate.day;
-
-    if (days < 0) {
-      months--;
-      days += DateTime(today.year, today.month, 0).day; // Ajusta os dias
-    }
-
-    if (months < 0) {
-      years--;
-      months += 12; // Ajusta os meses
-    }
-
-    return {'years': years, 'months': months, 'days': days};
-  }
-
-  String _formatAge(int years, int months, int days) {
-    return '$years anos, $months meses, $days dias';
-  }
-
   void _registerPet() async {
     if (_images.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -205,7 +183,8 @@ class _PetRegistrationState extends State<PetRegistration> {
         List<String> urls = [];
         if (!_images.isEmpty) {
           for (XFile image in _images) {
-            String? url = await uploadImageToCloudinary(image);
+            String? url =
+                await _cloudinaryService.uploadImageToCloudinary(image);
             if (url != null) {
               urls.add(url);
             }
@@ -214,16 +193,12 @@ class _PetRegistrationState extends State<PetRegistration> {
 
         final birthdateString = _birthdateController.text;
         final birthdate = DateFormat('dd/MM/yyyy').parse(birthdateString);
-        final ageData = _calculateAge(birthdate);
-
-        final ageFormatted =
-            _formatAge(ageData['years']!, ageData['months']!, ageData['days']!);
 
         Pet novoPet = Pet(
           id: petId,
           nome: _nameController.text,
           fotos: urls,
-          idade: ageFormatted,
+          dataDeNascimento: birthdate,
           porte: _selectedSize ?? "",
           sexo: _selectedSex ?? "",
           temperamento: _selectedTemperament ?? "",
@@ -496,8 +471,9 @@ class _PetRegistrationState extends State<PetRegistration> {
                     flex: 1,
                     child: ElevatedButton(
                       onPressed: _buscarCEP,
-                      child: Text("Buscar CEP"),
+                      child: Text("Buscar"),
                       style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: Color(0xFF50BB88),
                         foregroundColor: (Colors.white),
                       ),
@@ -513,6 +489,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   border: OutlineInputBorder(),
                 ),
                 validator: _validateRequiredField,
+                enabled: false,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -522,6 +499,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   border: OutlineInputBorder(),
                 ),
                 validator: _validateRequiredField,
+                enabled: false,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -531,6 +509,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   border: OutlineInputBorder(),
                 ),
                 validator: _validateRequiredField,
+                enabled: false,
               ),
               SizedBox(height: 20),
               TextFormField(
@@ -540,6 +519,7 @@ class _PetRegistrationState extends State<PetRegistration> {
                   border: OutlineInputBorder(),
                 ),
                 validator: _validateRequiredField,
+                enabled: false,
               ),
               SizedBox(height: 20),
               DropdownButtonFormField<String>(
@@ -574,6 +554,11 @@ class _PetRegistrationState extends State<PetRegistration> {
               ElevatedButton(
                 onPressed: _registerPet,
                 child: Text('Cadastrar Pet'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  backgroundColor: Color(0xFF50BB88),
+                  foregroundColor: (Colors.white),
+                ),
               ),
             ],
           ),

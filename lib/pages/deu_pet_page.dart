@@ -1,11 +1,13 @@
+import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/services/chat_service.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class MatchScreen extends StatefulWidget {
   final Channel chat;
+  final Usuario adotante;
 
-  MatchScreen({required this.chat});
+  MatchScreen({required this.chat, required this.adotante});
 
   @override
   _MatchScreenState createState() => _MatchScreenState();
@@ -145,7 +147,7 @@ class _MatchScreenState extends State<MatchScreen>
                                 width: 5.0,
                               ),
                               image: DecorationImage(
-                                image: AssetImage('assets/images/person2.jpg'),
+                                image: NetworkImage(widget.adotante.foto),
                                 fit: BoxFit.cover,
                               ),
                             ),

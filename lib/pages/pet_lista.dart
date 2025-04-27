@@ -220,7 +220,7 @@ class _PetListScreenState extends State<PetListScreen> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Text(
-                  '${data.nome}, ${data.idade}',
+                  '${data.nome}, ${petService.formatarIdade(data.dataDeNascimento)}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,

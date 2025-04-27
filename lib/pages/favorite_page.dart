@@ -157,7 +157,7 @@ class _FavoritePageState extends State<FavoritePage> {
           context,
           MaterialPageRoute(
             builder: (context) => PetIndividualPage(
-              data: pet.toMap(),
+              data: pet,
               favoritoId: favoritoId,
             ),
           ),
@@ -191,7 +191,7 @@ class _FavoritePageState extends State<FavoritePage> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Text(
-                  removeAno('${pet.nome}, ${pet.idade}'),
+                  '${pet.nome}, ${petService.formatarIdade(pet.dataDeNascimento)}',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -204,10 +204,5 @@ class _FavoritePageState extends State<FavoritePage> {
         ),
       ),
     );
-  }
-
-  String removeAno(String input) {
-    final regex = RegExp(r'\bano(s)?\b', caseSensitive: false);
-    return input.replaceAll(regex, '');
   }
 }

@@ -1,8 +1,10 @@
+import 'package:intl/intl.dart';
+
 class Pet {
   String id;
   String nome;
   List<String> fotos;
-  String idade;
+  DateTime dataDeNascimento;
   String especie;
   String raca;
   String porte;
@@ -21,7 +23,7 @@ class Pet {
     required this.id,
     required this.nome,
     required this.fotos,
-    required this.idade,
+    required this.dataDeNascimento,
     required this.especie,
     required this.raca,
     required this.porte,
@@ -42,7 +44,7 @@ class Pet {
       'id': id,
       'nome': nome,
       'fotos': fotos,
-      'idade': idade,
+      'data_de_nascimento': DateFormat('dd/MM/yyyy').format(dataDeNascimento),
       'especie': especie,
       'raca': raca,
       'porte': porte,
@@ -64,7 +66,7 @@ class Pet {
       id: map['id'],
       nome: map['nome'],
       fotos: List<String>.from(map['fotos'] ?? []),
-      idade: map['idade'].toString(),
+      dataDeNascimento: DateFormat('dd/MM/yyyy').parse(map['data_de_nascimento'] ?? ''),
       especie: map['especie'] ?? '',
       raca: map['raca'] ?? '',
       porte: map['porte'] ?? '',
@@ -85,7 +87,7 @@ class Pet {
     String? id,
     String? nome,
     List<String>? fotos,
-    String? idade,
+    DateTime? dataDeNascimento,
     String? especie,
     String? raca,
     String? porte,
@@ -104,7 +106,7 @@ class Pet {
       id: id ?? this.id,
       nome: nome ?? this.nome,
       fotos: fotos ?? this.fotos,
-      idade: idade ?? this.idade,
+      dataDeNascimento: dataDeNascimento ?? this.dataDeNascimento,
       especie: especie ?? this.especie,
       raca: raca ?? this.raca,
       porte: porte ?? this.porte,

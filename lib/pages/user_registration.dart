@@ -1,7 +1,5 @@
-import 'package:deu_pet/services/cloudinary_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
@@ -33,19 +31,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
   String? _selectedTipo;
-  XFile? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
   final AuthService _authService = AuthService();
   final UsuarioService _usuarioService = UsuarioService();
-
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = pickedFile;
-      });
-    }
-  }
 
   bool validarCPF(String cpf) {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
@@ -373,11 +360,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
 
       try {
-        String? imageUrl;
-        if (_selectedImage != null) {
-          imageUrl = await uploadImageToCloudinary(_selectedImage!);
-        }
-
         // Cria o usuário no Firebase Auth e obtém o UID
         UserCredential userCredential = await _authService.userRegistration(
           name: _nameController.text,
@@ -392,7 +374,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           uid: uid, // UID vindo do Firebase Auth
           cpf_cnpj: _cpfCnpjController.text,
           email: _emailController.text,
-          foto: imageUrl ?? "",
+          foto: "",
           tipo: _selectedTipo ?? "",
           nome: _nameController.text,
           telefone: _telefoneController.text,

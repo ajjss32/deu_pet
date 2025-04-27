@@ -6,7 +6,7 @@ import 'package:deu_pet/services/pet_service.dart';
 import 'package:flutter/material.dart';
 
 class PetIndividualPage extends StatefulWidget {
-  final Map<String, dynamic> data;
+  final Pet data;
   final String? favoritoId; // Adicionado para garantir ID do favorito
 
   const PetIndividualPage({super.key, required this.data, this.favoritoId});
@@ -17,6 +17,7 @@ class PetIndividualPage extends StatefulWidget {
 
 class _PetIndividualPageState extends State<PetIndividualPage> {
   final FavoritoService favoritoService = FavoritoService();
+  final PetService petService = PetService();
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +40,12 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
     }
     await favoritoService.deletarFavorito(widget.favoritoId!);
 
-    int favoritosRestantes = (await favoritoService.buscarFavoritosPorPet(
-            widget.data['id'], context))
-        .length;
+    int favoritosRestantes =
+        (await favoritoService.buscarFavoritosPorPet(widget.data.id, context))
+            .length;
 
     if (favoritosRestantes == 0) {
-      Pet petAtualizado = Pet.fromMap(widget.data);
+      Pet petAtualizado = widget.data;
       petAtualizado.status = 'Disponível';
 
       await PetService().atualizarPet(petAtualizado, context);
@@ -66,7 +67,7 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  widget.data['nome'] ?? 'Nome Desconhecido',
+                  widget.data.nome,
                   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 8),
@@ -81,7 +82,7 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
   }
 
   Widget _buildImageCarousel() {
-    List<dynamic> images = widget.data['fotos'] ?? [];
+    List<dynamic> images = widget.data.fotos;
 
     if (images.isEmpty) {
       images = [
@@ -114,39 +115,87 @@ class _PetIndividualPageState extends State<PetIndividualPage> {
 
   Widget _buildInfoGrid() {
     return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: GridView(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 2.5,
-          mainAxisSpacing: 4,
-          crossAxisSpacing: 4,
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 60.0),
+      child: SingleChildScrollView(
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Espécie/Raça',
+                value: widget.data.especie + '/' + widget.data.raca,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Idade',
+                value: '${petService.formatarIdade(widget.data.dataDeNascimento)}',
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(title: 'Sexo', value: widget.data.sexo, fontSize: 14),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child:
+                  InfoWidget(title: 'Porte', value: widget.data.porte, fontSize: 14),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Temperamento',
+                value: widget.data.temperamento,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Estado de saúde',
+                value: widget.data.estadoDeSaude,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Localização',
+                value: widget.data.endereco,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Necessidades especiais',
+                value: widget.data.necessidades,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'História',
+                value: widget.data.historia,
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.width / 2 - 20,
+              child: InfoWidget(
+                title: 'Status',
+                value: widget.data.status,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
-        children: [
-          InfoWidget(
-              title: 'Espécie/Raça',
-              value: (widget.data['especie'] ?? 'Desconhecido') + ' / ' + (widget.data['raca'] ?? 'Desconhecido')),
-          InfoWidget(
-              title: 'História',
-              value: widget.data['historia'] ?? 'Sem informação'),
-          InfoWidget(
-              title: 'Idade', value: widget.data['idade'] ?? 'Não informado'),
-          InfoWidget(
-              title: 'Estado de saúde',
-              value: widget.data['estadoDeSaude'] ?? 'Não informado'),
-          InfoWidget(
-              title: 'Sexo', value: widget.data['sexo'] ?? 'Não informado'),
-          InfoWidget(
-              title: 'Localização',
-              value: widget.data['endereco'] ?? 'Não informado'),
-          InfoWidget(
-              title: 'Porte', value: widget.data['porte'] ?? 'Não informado'),
-          InfoWidget(
-              title: 'Necessidades especiais',
-              value: widget.data['necessidades'] ?? 'Nenhuma'),
-        ],
       ),
     );
   }

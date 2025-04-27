@@ -115,18 +115,10 @@ class _ProfilePageState extends State<ProfilePage> with RouteAware {
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundImage: _usuario!.foto != null
-                              ? NetworkImage(_usuario!.foto!)
+                          backgroundImage: _usuario!.foto.isNotEmpty
+                              ? NetworkImage(_usuario!.foto)
                               : AssetImage('assets/images/default_profile.png')
                                   as ImageProvider, // Imagem padrão caso não haja foto
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: Icon(Icons.camera_alt, color: Colors.grey),
-                          ),
                         ),
                       ],
                     ),

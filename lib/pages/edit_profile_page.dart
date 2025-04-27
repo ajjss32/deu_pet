@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:deu_pet/services/cloudinary_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/services/user_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final Usuario usuario;
@@ -13,6 +18,7 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   final UsuarioService _usuarioService = UsuarioService();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
 
   // Controladores para os campos do formulário
   final TextEditingController _nameController = TextEditingController();
@@ -25,6 +31,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _bairroController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _estadoController = TextEditingController();
+  final TextEditingController _fotoController = TextEditingController();
+  XFile? _selectedImage;
 
   @override
   void initState() {
@@ -34,6 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _telefoneController.text = widget.usuario.telefone;
     _dataNascimentoController.text = widget.usuario.dataNascimento;
     _descricaoController.text = widget.usuario.descricao;
+    _fotoController.text = widget.usuario.foto;
 
     // Preenche os campos de endereço
     final partesEndereco = widget.usuario.endereco.split(', ');
@@ -42,6 +51,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       _bairroController.text = partesEndereco[1];
       _cidadeController.text = partesEndereco[2];
       _estadoController.text = partesEndereco[3];
+    }
+
+    if (widget.usuario.foto.isNotEmpty) {
+      _fotoController.text = widget.usuario.foto;
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = pickedFile;
+      });
     }
   }
 
@@ -54,6 +77,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
       usuario.descricao = _descricaoController.text;
       usuario.endereco =
           "${_logradouroController.text}, ${_bairroController.text}, ${_cidadeController.text}, ${_estadoController.text}";
+
+      if (_selectedImage != null) {
+        String? url =
+            await _cloudinaryService.uploadImageToCloudinary(_selectedImage!);
+        await _cloudinaryService.deleteImageFromCloudinary(usuario.foto);
+        usuario.foto = url!;
+      }
 
       // Atualiza os dados do usuário no Firestore
       await _usuarioService.atualizarUsuario(usuario);
@@ -197,6 +227,37 @@ class _EditProfilePageState extends State<EditProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: _selectedImage != null
+                          ? (kIsWeb
+                              ? Image.network(_selectedImage!.path).image
+                              : Image.memory(
+                                  Uint8List.fromList(File(_selectedImage!.path)
+                                      .readAsBytesSync()),
+                                  fit: BoxFit.cover,
+                                ).image)
+                          : widget.usuario.foto.isNotEmpty
+                              ? NetworkImage(widget.usuario.foto)
+                              : AssetImage('assets/images/default_profile.png'),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.camera_alt, color: Colors.grey),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             _buildTextField(_nameController, "Nome", Icons.person),
             _buildTextField(_telefoneController, "Telefone", Icons.phone),
             GestureDetector(
@@ -223,6 +284,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: Text("Buscar"),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 15),
+                      backgroundColor: Color(0xFF50BB88),
+                      foregroundColor: (Colors.white),
                     ),
                   ),
                 ),

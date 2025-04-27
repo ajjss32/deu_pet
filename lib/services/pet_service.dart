@@ -107,24 +107,48 @@ class PetService {
     }
   }
 
-  // docs.map((doc) => Pet.fromMap({'id': doc.id, ...doc.data() as Map<String, dynamic>}, doc.data() as Map<String, dynamic>)).toList();
-  // Future<Usuario?> buscarUsuarioPorUid(String uid) async {
-  //   try {
-  //     QuerySnapshot querySnapshot =
-  //         await usuariosCollection.where('uid', isEqualTo: uid).get();
+  int calcularIdade(DateTime dataDeNascimento) {
+    DateTime agora = DateTime.now();
 
-  //     if (querySnapshot.docs.isNotEmpty) {
-  //       var doc = querySnapshot.docs.first;
-  //       Usuario usuario =
-  //           Usuario.fromMap(uid, doc.data() as Map<String, dynamic>);
-  //       return usuario;
-  //     } else {
-  //       print('Usuário não encontrado');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     print('Erro ao buscar usuário: $e');
-  //     return null;
-  //   }
-  // }
+    // Calcula a diferença em anos, meses e dias
+    int anos = agora.year - dataDeNascimento.year;
+    int meses = agora.month - dataDeNascimento.month;
+    int dias = agora.day - dataDeNascimento.day;
+
+    // Ajusta para o caso de meses ou dias negativos
+    if (meses < 0) {
+      anos--;
+      meses += 12;
+    }
+    if (dias < 0) {
+      meses--;
+      // Ajuste o número de dias com base no mês anterior
+      dias += DateTime(agora.year, agora.month, 0).day;
+    }
+
+    // Se a diferença for menor que um ano, retorna em meses
+    if (anos == 0 && meses == 0) {
+      return dias; // Retorna em dias
+    } else if (anos == 0) {
+      return meses; // Retorna em meses
+    } else {
+      return anos; // Retorna em anos
+    }
+  }
+
+  String formatarIdade(DateTime dataDeNascimento) {
+    int idade = calcularIdade(dataDeNascimento);
+
+    DateTime agora = DateTime.now();
+    int anos = agora.year - dataDeNascimento.year;
+    int meses = agora.month - dataDeNascimento.month;
+
+    if (anos == 0 && meses == 0) {
+      return '$idade dias';
+    } else if (anos == 0) {
+      return '$idade meses';
+    } else {
+      return '$idade anos';
+    }
+  }
 }

@@ -155,8 +155,10 @@ class _SeeInterestedPageState extends State<SeeInterestedPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            MatchScreen(chat: novoChat),
+                        builder: (context) => MatchScreen(
+                          chat: novoChat,
+                          adotante: interestedPeople[index],
+                        ),
                       ),
                     );
                   },
