@@ -106,6 +106,10 @@ class _SwipeCardState extends State<SwipeCard> {
                     numberOfCardsDisplayed: 1,
                     backCardOffset: Offset.zero,
                     padding: const EdgeInsets.all(0.0),
+                    isLoop: false,
+                    onEnd: () => _getPets(),
+                    allowedSwipeDirection:
+                        AllowedSwipeDirection.only(left: true, right: true),
                     onSwipe: (previousIndex, currentIndex, direction) {
                       if (previousIndex >= 0 && previousIndex < _pets.length) {
                         if (direction == CardSwiperDirection.left) {
@@ -242,12 +246,6 @@ class _SwipeCardState extends State<SwipeCard> {
       petId: pet.id,
       dataRejeicao: DateTime.now(),
     ));
-
-    int indexToRemove = _pets.indexWhere((p) => p.id == pet.id);
-
-    setState(() {
-      _pets.removeAt(indexToRemove);
-    });
   }
 
   void _handleFavorito(Pet pet) async {
@@ -270,11 +268,5 @@ class _SwipeCardState extends State<SwipeCard> {
         context);
 
     PetService().atualizarPet(pet, context);
-
-    int indexToRemove = _pets.indexWhere((p) => p.id == pet.id);
-
-    setState(() {
-      _pets.removeAt(indexToRemove);
-    });
   }
 }
