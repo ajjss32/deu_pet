@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:deu_pet/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/model/pet.dart';
 
@@ -85,9 +86,10 @@ class PetService {
     }
   }
 
-  Future<List<Pet>> buscarTodosPets() async {
+  Future<List<Pet>> buscarTodosPets(Usuario usuarioLogado) async {
     try {
-      // Consulta sem filtros para buscar todos os pets
+      String cidadeUsuario = _extrairCidade(usuarioLogado.endereco);
+
       QuerySnapshot querySnapshot = await petsCollection.get();
 
       final results = querySnapshot.docs
@@ -95,12 +97,24 @@ class PetService {
                 'id': doc.id,
                 ...doc.data() as Map<String, dynamic>,
               }))
-          .toList();
+          .where((pet) {
+        String cidadePet = _extrairCidade(pet.endereco);
+        return cidadePet.toLowerCase() == cidadeUsuario.toLowerCase();
+      }).toList();
 
       return results;
     } catch (e) {
       print('Erro ao buscar todos os pets: $e');
       return [];
+    }
+  }
+
+  String _extrairCidade(String endereco) {
+    List<String> partes = endereco.split(',');
+    if (partes.length >= 3) {
+      return partes[2].trim();
+    } else {
+      return '';
     }
   }
 

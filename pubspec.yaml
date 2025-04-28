@@ -46,6 +46,7 @@ flutter:
     - assets/images/pet4.jpg
     - assets/images/pet5.jpg
     - assets/images/pet6.jpg
+    - assets/images/default_profile.png
     - assets/images/pet9.png
     - assets/images/pet10.jpeg
     - assets/images/pet12.jpeg

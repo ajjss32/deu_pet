@@ -41,7 +41,7 @@ class _SwipeCardState extends State<SwipeCard> {
     await rejeicaoService.excluirRejeicoesExpiradas();
 
     // Buscar todos os pets
-    final List<Pet> todosPets = await petService.buscarTodosPets();
+    final List<Pet> todosPets = await petService.buscarTodosPets(user);
 
     // Buscar pets favoritos do usuário
     final List<Favorito> favoritos =
@@ -103,17 +103,19 @@ class _SwipeCardState extends State<SwipeCard> {
                   child: CardSwiper(
                     controller: controller,
                     cardsCount: _pets.length,
-                    onSwipe: (previousIndex, currentIndex, direction) {
-                      if (direction == CardSwiperDirection.left) {
-                        _handleRejeicao(_pets[previousIndex]);
-                      } else if (direction == CardSwiperDirection.right) {
-                        _handleFavorito(_pets[previousIndex]);
-                      }
-                      return true;
-                    },
                     numberOfCardsDisplayed: 1,
                     backCardOffset: Offset.zero,
                     padding: const EdgeInsets.all(0.0),
+                    onSwipe: (previousIndex, currentIndex, direction) {
+                      if (previousIndex >= 0 && previousIndex < _pets.length) {
+                        if (direction == CardSwiperDirection.left) {
+                          _handleRejeicao(_pets[previousIndex]);
+                        } else if (direction == CardSwiperDirection.right) {
+                          _handleFavorito(_pets[previousIndex]);
+                        }
+                      }
+                      return true;
+                    },
                     cardBuilder: (context, index, _, __) {
                       var pet = _pets[index];
                       return Card(

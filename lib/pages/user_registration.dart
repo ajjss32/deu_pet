@@ -1,10 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:deu_pet/services/auth_service.dart';
 import 'package:deu_pet/services/user_service.dart';
 import 'package:deu_pet/model/user.dart';
 import 'package:deu_pet/pages/login_page.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:deu_pet/services/cloudinary_service.dart';
 
 class RegistrationPage extends StatefulWidget {
   final StreamChatClient client;
@@ -22,6 +26,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _telefoneController = TextEditingController();
   final TextEditingController _descricaoController = TextEditingController();
+  final CloudinaryService _cloudinaryService = CloudinaryService();
   final TextEditingController _dataNascimentoController =
       TextEditingController();
   final TextEditingController _cpfCnpjController = TextEditingController();
@@ -33,6 +38,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String? _selectedTipo;
   final AuthService _authService = AuthService();
   final UsuarioService _usuarioService = UsuarioService();
+  XFile? _selectedImage;
 
   bool validarCPF(String cpf) {
     cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
@@ -74,6 +80,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       if (digito != int.parse(cnpj[i])) return false;
     }
     return true;
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = pickedFile;
+      });
+    }
   }
 
   Future<void> _buscarCEP() async {
@@ -141,6 +157,38 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         color: Colors.black54,
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: _selectedImage != null
+                          ? (kIsWeb
+                              ? Image.network(_selectedImage!.path).image
+                              : FileImage(File(_selectedImage!.path))
+                                  as ImageProvider)
+                          : AssetImage('assets/images/default_profile.png')
+                              as ImageProvider,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: InkWell(
+                        onTap: _pickImage,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey.shade300,
+                          ),
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.camera_alt, size: 20),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -385,7 +433,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
           dataCriacao: DateTime.now(),
           dataAtualizacao: DateTime.now(),
         );
-
+        if (_selectedImage != null) {
+          String? url =
+              await _cloudinaryService.uploadImageToCloudinary(_selectedImage!);
+          novoUsuario.foto = url!;
+        }
         // Salva o usuário no Firestore com o UID correto
         await _usuarioService.criarUsuario(novoUsuario);
 
